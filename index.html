@@ -5,7 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ASET Cerdas 3D — Sistem AI Vision & Rekonsiliasi e-BMD Puskesmas Silian Raya</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <meta name="theme-color" content="#0d131f" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="ASET Cerdas" />
+  <link rel="manifest" id="pwaManifestLink" href="#" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -332,6 +339,7 @@
     <input type="file" id="detailPhotoInput" accept="image/*" />
     <input type="file" id="mobileCameraInput" accept="image/*" capture="environment" />
     <input type="file" id="mobileGalleryInput" accept="image/*" />
+    <input type="file" id="importJsonSyncInput" accept=".json,application/json" />
   </div>
 
   <!-- MAIN APPLICATION SHELL (Matches Attachment 2 Layout 1:1) -->
@@ -474,6 +482,10 @@
 
           <button type="button" id="btnSwitchToMobileTop" class="btn-3d-primary px-3 py-1.5 text-xs flex items-center gap-1.5" style="background: linear-gradient(180deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 0 0 #047857;">
             <span>📱 Buka Tampilan HP</span>
+          </button>
+
+          <button type="button" id="btnTopQuickSyncPull" class="btn-3d-neutral px-3 py-1.5 text-xs font-bold flex items-center gap-1.5 border border-sky-400/40 text-sky-300" title="Tarik foto & spesifikasi terbaru yang disimpan dari HP">
+            <span>🔄 Sinkronkan Foto HP ⇄ Web</span>
           </button>
 
           <button type="button" id="btnOpenCloudGuideTop" class="btn-3d-neutral px-3 py-1.5 text-xs font-semibold flex items-center gap-1.5 border border-emerald-400/30">
@@ -1298,7 +1310,10 @@
             <span class="px-2.5 py-1 rounded-lg font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">📱 MODE APLIKASI HP</span>
             <span class="opacity-80">Alur Cepat: <strong>1. Foto Barang</strong> ➔ <strong>2. AI Membaca</strong> ➔ <strong>3. Muncul Detail Barang & Tersimpan Online</strong></span>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 flex-wrap">
+            <button type="button" id="btnInstallAndroidPWA" class="btn-3d-primary px-3 py-1.5 text-xs font-bold flex items-center gap-1.5" style="background: linear-gradient(180deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 0 0 #047857;">
+              <span>📲 Install Aplikasi Android (Offline/Online)</span>
+            </button>
             <button type="button" id="btnTogglePhoneWidth" class="btn-3d-neutral px-3 py-1.5 text-xs font-semibold">
               ↔️ Perlebar / Ukuran Layar HP
             </button>
@@ -1472,6 +1487,57 @@
                     </div>
                   </div>
 
+                  <!-- Unsaved Changes / Save Confirmation Banner on Mobile -->
+                  <div id="mobSaveStatusBanner" class="p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-400/35 text-[11px] text-emerald-300 font-semibold flex items-center justify-between gap-2">
+                    <span id="mobSaveStatusText">✅ Data & foto barang siap. Jika Anda mengubah foto/spesifikasi di bawah, tekan tombol SIMPAN.</span>
+                  </div>
+
+                  <!-- FORM ISI CEPAT SPESIFIKASI BARANG & FOTO DI HP -->
+                  <div class="rounded-2xl bg-slate-900/90 p-3 space-y-2.5 border border-sky-400/30">
+                    <div class="flex items-center justify-between border-b border-white/10 pb-1.5">
+                      <span class="text-[11px] font-extrabold text-sky-300 uppercase tracking-wide">📝 ISI / UBAH SPESIFIKASI & FOTO BARANG</span>
+                      <span class="text-[10px] opacity-70">Langsung di HP</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-left">
+                      <div>
+                        <label class="block text-[10px] opacity-70 mb-0.5">Nama Barang:</label>
+                        <input type="text" id="mobQuickNama" class="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-slate-500/40 text-xs font-semibold text-white" />
+                      </div>
+                      <div>
+                        <label class="block text-[10px] opacity-70 mb-0.5">Merek / Tipe:</label>
+                        <input type="text" id="mobQuickMerk" class="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-slate-500/40 text-xs font-semibold text-amber-300" />
+                      </div>
+                      <div>
+                        <label class="block text-[10px] opacity-70 mb-0.5">Nomor Rangka / Nomor Seri:</label>
+                        <input type="text" id="mobQuickSeri" class="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-slate-500/40 text-xs font-mono text-white" />
+                      </div>
+                      <div>
+                        <label class="block text-[10px] opacity-70 mb-0.5">Ruangan / Lokasi:</label>
+                        <input type="text" id="mobQuickRuangan" class="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-slate-500/40 text-xs text-white" />
+                      </div>
+                      <div class="sm:col-span-2">
+                        <label class="block text-[10px] opacity-70 mb-0.5">Kondisi Fisik Barang:</label>
+                        <select id="mobQuickKondisi" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-800 border border-slate-500/40 text-xs font-bold text-white">
+                          <option value="Baik">Baik (Terverifikasi e-BMD)</option>
+                          <option value="Perlu Pemeriksaan">Perlu Pemeriksaan / Kalibrasi</option>
+                          <option value="Rusak Ringan">Rusak Ringan</option>
+                          <option value="Rusak Berat">Rusak Berat</option>
+                        </select>
+                      </div>
+                      <div class="sm:col-span-2">
+                        <label class="block text-[10px] opacity-70 mb-0.5">Spesifikasi Teknis Lengkap / Catatan Fisik:</label>
+                        <textarea id="mobQuickSpek" rows="2" class="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-slate-500/40 text-xs text-white" placeholder="Ketik spesifikasi barang, warna, bahan, nomor seri, atau kondisi..."></textarea>
+                      </div>
+                    </div>
+
+                    <!-- EXPLICIT SAVE BUTTON REQUESTED BY USER -->
+                    <button type="button" id="btnMobileExplicitSave" class="btn-3d-primary w-full py-3 px-4 text-xs font-extrabold flex items-center justify-center gap-2 shadow-lg" style="background: linear-gradient(180deg, #10b981 0%, #059669 100%); box-shadow: 0 5px 0 0 #047857, 0 10px 20px rgba(16,185,129,0.35);">
+                      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                      <span>💾 SIMPAN FOTO & SPESIFIKASI BARANG</span>
+                    </button>
+                  </div>
+
                   <!-- Quick Mobile Actions on Identified Item -->
                   <div class="grid grid-cols-3 gap-2 pt-1">
                     <button type="button" id="btnMobUpdatePhoto" class="btn-3d-primary py-2 px-2 text-[11px] text-center">
@@ -1483,6 +1549,37 @@
                     <button type="button" id="btnMobOpenFullModal" class="btn-3d-neutral py-2 px-2 text-[11px] font-semibold text-center">
                       ✏️ Edit & QR
                     </button>
+                  </div>
+
+                  <!-- PANEL SINKRONISASI CEPAT HP ⇄ WEB LAPTOP -->
+                  <div class="rounded-2xl bg-sky-500/10 border border-sky-400/30 p-3 space-y-2 text-[11px]">
+                    <div class="flex items-center justify-between">
+                      <span class="font-extrabold text-sky-300">🔄 Sinkronisasi Foto HP ⇄ Versi Web Laptop</span>
+                      <span id="mobCloudBadgeMini" class="px-2 py-0.5 rounded bg-white/10 text-[10px] font-semibold">Lokal HP</span>
+                    </div>
+                    <p class="text-[10px] opacity-80 leading-relaxed">
+                      Agar foto yang diganti di HP langsung tampil di Web Laptop, tempelkan URL <strong>Firebase Realtime Database</strong> yang sama di HP & Web, atau gunakan <strong>File Sinkron (.JSON)</strong>:
+                    </p>
+                    <div class="flex gap-1.5">
+                      <input type="url" id="mobFirebaseUrlQuick" placeholder="https://nama-db.asia-southeast1.firebasedatabase.app" class="flex-1 min-w-0 px-2.5 py-1.5 rounded-lg bg-black/40 border border-sky-400/35 text-[10px] font-mono text-white" />
+                      <button type="button" id="btnMobCopySyncLink" class="btn-3d-neutral px-2.5 py-1.5 text-[10px] font-bold shrink-0" title="Salin Link Web yang sudah berisi URL Cloud agar tinggal dibuka di HP/Laptop">
+                        🔗 Link Sync
+                      </button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-1.5 pt-0.5">
+                      <button type="button" id="btnMobQuickPushCloud" class="btn-3d-primary py-1.5 px-2 text-[10px] font-bold">
+                        ☁️ Kirim Data HP ke Web
+                      </button>
+                      <button type="button" id="btnMobQuickPullCloud" class="btn-3d-neutral py-1.5 px-2 text-[10px] font-bold text-sky-300">
+                        🔄 Tarik Data dari Cloud
+                      </button>
+                      <button type="button" id="btnMobExportSyncJson" class="btn-3d-neutral py-1.5 px-2 text-[10px] font-semibold">
+                        📤 Kirim File Sync (.JSON)
+                      </button>
+                      <button type="button" id="btnMobImportSyncJson" class="btn-3d-neutral py-1.5 px-2 text-[10px] font-semibold text-amber-300">
+                        📥 Muat File Sync (.JSON)
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2036,6 +2133,10 @@
 
       function animate() {
         requestAnimationFrame(animate);
+        const mobView = document.getElementById('view-mobile-hp');
+        if (mobView && !mobView.classList.contains('hidden')) {
+          return; // Pause 3D WebGL rendering in Mobile Lite view for maximum speed & battery life
+        }
         if (turntableGroup && !isDragging3D) {
           turntableGroup.rotation.y += 0.008 * rotationSpeedFactor;
         }
@@ -2767,6 +2868,19 @@
         document.getElementById('mobResPerolehan').textContent = `${a.cara_perolehan} (${a.tanggal_perolehan})`;
         document.getElementById('mobResKondisi').textContent = `${a.kondisi} • ${a.status_rekon}`;
         document.getElementById('mobResSpek').textContent = a.spesifikasi_teknis;
+
+        const qNama = document.getElementById('mobQuickNama');
+        const qMerk = document.getElementById('mobQuickMerk');
+        const qSeri = document.getElementById('mobQuickSeri');
+        const qRuang = document.getElementById('mobQuickRuangan');
+        const qKond = document.getElementById('mobQuickKondisi');
+        const qSpek = document.getElementById('mobQuickSpek');
+        if (qNama) qNama.value = a.nama || '';
+        if (qMerk) qMerk.value = a.merk || '';
+        if (qSeri) qSeri.value = a.nomor_rangka || '';
+        if (qRuang) qRuang.value = a.ruangan || '';
+        if (qKond) qKond.value = a.kondisi || 'Baik';
+        if (qSpek) qSpek.value = a.spesifikasi_teknis || '';
 
         const pb = document.getElementById('mobResPhotoBadge');
         pb.textContent = a.has_photo ? 'Foto Lengkap' : 'Belum Ada Foto';
@@ -3639,6 +3753,280 @@
         URL.revokeObjectURL(url);
         showToast('Backup JSON berhasil diunduh!');
       });
+
+      // =====================================================================
+      // 11. OPTIMASI VERSI HP: TOMBOL SIMPAN EKSPLISIT, LIVE QR SCANNER (jsQR),
+      //     SINKRONISASI HP ⇄ WEB, & ANDROID PWA (OFFLINE/ONLINE)
+      // =====================================================================
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const cloudParam = urlParams.get('cloud');
+        if (cloudParam && cloudParam.startsWith('http')) {
+          firebaseDbUrl = cloudParam.trim().replace(/\/+$/, '');
+          localStorage.setItem('aset_cerdas_firebase_url', firebaseDbUrl);
+          const inp1 = document.getElementById('firebaseDbUrlInput');
+          const inp2 = document.getElementById('mobFirebaseUrlQuick');
+          if (inp1) inp1.value = firebaseDbUrl;
+          if (inp2) inp2.value = firebaseDbUrl;
+          setTimeout(() => pullFromFirebaseCloud(), 450);
+        } else if (firebaseDbUrl) {
+          const inp2 = document.getElementById('mobFirebaseUrlQuick');
+          if (inp2) inp2.value = firebaseDbUrl;
+          const miniBadge = document.getElementById('mobCloudBadgeMini');
+          if (miniBadge) {
+            miniBadge.textContent = 'Cloud Siap';
+            miniBadge.className = 'px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold';
+          }
+        }
+      } catch (e) {}
+
+      // Mark unsaved indicator when user edits any mobile specification input
+      ['mobQuickNama', 'mobQuickMerk', 'mobQuickSeri', 'mobQuickRuangan', 'mobQuickKondisi', 'mobQuickSpek'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const markDirty = () => {
+          const banner = document.getElementById('mobSaveStatusBanner');
+          const txt = document.getElementById('mobSaveStatusText');
+          if (banner && txt) {
+            banner.className = 'p-2.5 rounded-xl bg-amber-500/20 border border-amber-400/50 text-[11px] text-amber-200 font-bold flex items-center justify-between gap-2 animate-pulse';
+            txt.textContent = '⚠️ Ada perubahan spesifikasi belum disimpan — Tekan tombol "💾 SIMPAN FOTO & SPESIFIKASI BARANG" di bawah!';
+          }
+        };
+        el.addEventListener('input', markDirty);
+        el.addEventListener('change', markDirty);
+      });
+
+      // Explicit Save Button on Mobile ("💾 SIMPAN FOTO & SPESIFIKASI BARANG")
+      const btnMobSave = document.getElementById('btnMobileExplicitSave');
+      if (btnMobSave) {
+        btnMobSave.addEventListener('click', async () => {
+          const a = assets.find(x => x.id === Number(currentAssetId)) || assets[0];
+          if (!a) return;
+
+          const qNama = document.getElementById('mobQuickNama')?.value.trim();
+          const qMerk = document.getElementById('mobQuickMerk')?.value.trim();
+          const qSeri = document.getElementById('mobQuickSeri')?.value.trim();
+          const qRuang = document.getElementById('mobQuickRuangan')?.value.trim();
+          const qKond = document.getElementById('mobQuickKondisi')?.value;
+          const qSpek = document.getElementById('mobQuickSpek')?.value.trim();
+
+          if (qNama) a.nama = qNama;
+          if (qMerk) a.merk = qMerk;
+          if (qSeri) a.nomor_rangka = qSeri;
+          if (qRuang) a.ruangan = qRuang;
+          if (qKond) a.kondisi = qKond;
+          if (qSpek !== undefined) a.spesifikasi_teknis = qSpek;
+          a.status_rekon = 'Terverifikasi e-BMD';
+          a.qr_payload = `EBMD-SILIANRAYA|${a.kode_aset}|NIBAR:${a.nibar}|${a.nama}|${a.merk}|RP:${Math.round(a.nilai_perolehan)}`;
+
+          // Sync URL from quick input if user typed it on Mobile
+          const quickUrlInp = document.getElementById('mobFirebaseUrlQuick');
+          if (quickUrlInp && quickUrlInp.value.trim()) {
+            firebaseDbUrl = quickUrlInp.value.trim().replace(/\/+$/, '');
+            const mainUrlInp = document.getElementById('firebaseDbUrlInput');
+            if (mainUrlInp) mainUrlInp.value = firebaseDbUrl;
+            try { localStorage.setItem('aset_cerdas_firebase_url', firebaseDbUrl); } catch (e) {}
+          }
+
+          saveState();
+          updateKPIs();
+          selectAssetForStage(a.id, false);
+          renderCatalogTable();
+          renderRekonGrid();
+          renderMobileView();
+
+          const nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          const banner = document.getElementById('mobSaveStatusBanner');
+          const txt = document.getElementById('mobSaveStatusText');
+
+          if (firebaseDbUrl) {
+            await pushToFirebaseCloud(false);
+            if (banner && txt) {
+              banner.className = 'p-2.5 rounded-xl bg-emerald-500/25 border-2 border-emerald-400 text-[11px] text-emerald-200 font-extrabold flex items-center justify-between gap-2';
+              txt.textContent = `✅ TERSIMPAN & TERSINKRON KE WEB CLOUD (${nowStr}) — Foto & Spesifikasi ${a.kode_aset} berhasil diperbarui!`;
+            }
+          } else {
+            if (banner && txt) {
+              banner.className = 'p-2.5 rounded-xl bg-emerald-500/20 border border-emerald-400/50 text-[11px] text-emerald-200 font-bold flex items-center justify-between gap-2';
+              txt.textContent = `✅ TERSIMPAN DI HP (${nowStr}) — Untuk sinkron otomatis ke Web Laptop, isi URL Firebase di bawah atau klik "📤 Kirim File Sync (.JSON)".`;
+            }
+            showToast(`✅ Tersimpan! Data & Foto ${a.kode_aset} berhasil disimpan.`);
+          }
+        });
+      }
+
+      // Hook Real-Time QR Code Scanner (jsQR) into #mobileLiveVideoEl whenever camera is active
+      function runLiveQRScannerTick() {
+        const video = document.getElementById('mobileLiveVideoEl');
+        const cont = document.getElementById('mobileLiveCameraContainer');
+        if (video && cont && !cont.classList.contains('hidden') && video.readyState === video.HAVE_ENOUGH_DATA && typeof jsQR !== 'undefined') {
+          const cw = 300;
+          const ch = 220;
+          if (!window.__qrScanCanvas) {
+            window.__qrScanCanvas = document.createElement('canvas');
+            window.__qrScanCanvas.width = cw;
+            window.__qrScanCanvas.height = ch;
+          }
+          const qctx = window.__qrScanCanvas.getContext('2d');
+          qctx.drawImage(video, 0, 0, cw, ch);
+          const imgData = qctx.getImageData(0, 0, cw, ch);
+          const code = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: 'dontInvert' });
+          if (code && code.data) {
+            const raw = code.data.trim();
+            const found = assets.find(a =>
+              raw.includes(a.kode_aset) ||
+              raw.includes(a.nibar) ||
+              raw.toLowerCase().includes(a.nama.toLowerCase())
+            );
+            if (found) {
+              stopMobileLiveCamera();
+              aiScanCountToday += 1;
+              selectAssetForStage(found.id, true);
+              updateKPIs();
+              renderMobileView();
+              showToast(`🎯 QR Code Terbaca Otomatis: ${found.kode_aset} — ${found.nama}!`);
+            }
+          }
+        }
+        requestAnimationFrame(runLiveQRScannerTick);
+      }
+      requestAnimationFrame(runLiveQRScannerTick);
+
+      // Quick Sync Controls (HP ⇄ Web)
+      document.getElementById('btnTopQuickSyncPull')?.addEventListener('click', () => {
+        if (firebaseDbUrl) {
+          pullFromFirebaseCloud();
+        } else {
+          switchView('cloud-awam');
+          showToast('Hubungkan URL Firebase atau muat File Sync (.JSON) dari HP Anda.');
+        }
+      });
+
+      document.getElementById('btnMobQuickPushCloud')?.addEventListener('click', () => {
+        const inp = document.getElementById('mobFirebaseUrlQuick');
+        if (inp && inp.value.trim()) {
+          firebaseDbUrl = inp.value.trim().replace(/\/+$/, '');
+          const mainInp = document.getElementById('firebaseDbUrlInput');
+          if (mainInp) mainInp.value = firebaseDbUrl;
+          try { localStorage.setItem('aset_cerdas_firebase_url', firebaseDbUrl); } catch (e) {}
+        }
+        pushToFirebaseCloud(false);
+      });
+
+      document.getElementById('btnMobQuickPullCloud')?.addEventListener('click', () => {
+        const inp = document.getElementById('mobFirebaseUrlQuick');
+        if (inp && inp.value.trim()) {
+          firebaseDbUrl = inp.value.trim().replace(/\/+$/, '');
+          const mainInp = document.getElementById('firebaseDbUrlInput');
+          if (mainInp) mainInp.value = firebaseDbUrl;
+          try { localStorage.setItem('aset_cerdas_firebase_url', firebaseDbUrl); } catch (e) {}
+        }
+        pullFromFirebaseCloud();
+      });
+
+      document.getElementById('btnMobCopySyncLink')?.addEventListener('click', () => {
+        const inp = document.getElementById('mobFirebaseUrlQuick') || document.getElementById('firebaseDbUrlInput');
+        const urlVal = (inp?.value || firebaseDbUrl || '').trim().replace(/\/+$/, '');
+        if (!urlVal) {
+          showToast('Tempelkan URL Firebase Realtime Database Anda terlebih dahulu di kotak URL.');
+          return;
+        }
+        firebaseDbUrl = urlVal;
+        try { localStorage.setItem('aset_cerdas_firebase_url', firebaseDbUrl); } catch (e) {}
+        const shareUrl = `${window.location.origin}${window.location.pathname}?cloud=${encodeURIComponent(firebaseDbUrl)}`;
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(shareUrl);
+        }
+        showToast('🔗 Link Sinkronisasi disalin! Buka link ini di HP/Laptop agar otomatis terhubung.');
+      });
+
+      document.getElementById('btnMobExportSyncJson')?.addEventListener('click', () => {
+        const blob = new Blob([JSON.stringify(assets, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Sinkron_Aset_HP_ke_Web_Silian_Raya.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('📤 File Sinkron (.JSON) diunduh! Kirim ke Laptop lalu klik "Muat File Sync".');
+      });
+
+      document.getElementById('btnMobImportSyncJson')?.addEventListener('click', () => {
+        document.getElementById('importJsonSyncInput')?.click();
+      });
+
+      document.getElementById('importJsonSyncInput')?.addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          try {
+            const parsed = JSON.parse(ev.target.result);
+            const arr = Array.isArray(parsed) ? parsed : parsed.assets;
+            if (Array.isArray(arr) && arr.length > 0) {
+              assets = arr;
+              saveState();
+              updateKPIs();
+              selectAssetForStage(currentAssetId, false);
+              renderCatalogTable();
+              renderRekonGrid();
+              renderMobileView();
+              showToast(`✅ Berhasil menyinkronkan ${assets.length} aset & foto dari file!`);
+            }
+          } catch (err) {
+            showToast('Format file JSON tidak valid.');
+          }
+        };
+        reader.readAsText(file);
+        e.target.value = '';
+      });
+
+      // Progressive Web App (PWA) Manifest + Offline Service Worker + Install Prompt for Android
+      let deferredInstallPrompt = null;
+      try {
+        const manifestObj = {
+          name: 'ASET Cerdas e-BMD Puskesmas Silian Raya',
+          short_name: 'ASET Cerdas',
+          description: 'Aplikasi Scan Kamera, QR Code & Spesifikasi Aset e-BMD Puskesmas Silian Raya (Offline & Online)',
+          start_url: window.location.href.split('?')[0],
+          display: 'standalone',
+          background_color: '#0d131f',
+          theme_color: '#0ea5e9',
+          orientation: 'portrait-primary',
+          icons: [
+            {
+              src: EMBEDDED_IMGS.assistant,
+              sizes: '192x192',
+              type: 'image/jpeg'
+            },
+            {
+              src: EMBEDDED_IMGS.assistant,
+              sizes: '512x512',
+              type: 'image/jpeg'
+            }
+          ]
+        };
+        const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+        const manifestUrl = URL.createObjectURL(manifestBlob);
+        const manifestLink = document.getElementById('pwaManifestLink');
+        if (manifestLink) manifestLink.setAttribute('href', manifestUrl);
+      } catch (e) {}
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredInstallPrompt = e;
+      });
+
+      document.getElementById('btnInstallAndroidPWA')?.addEventListener('click', async () => {
+        if (deferredInstallPrompt) {
+          deferredInstallPrompt.prompt();
+          await deferredInstallPrompt.userChoice;
+          deferredInstallPrompt = null;
+        } else {
+          showToast('📲 Di Chrome Android: ketuk ikon Titik Tiga (⋮) di pojok kanan atas ➔ pilih "Tambahkan ke Layar Utama / Install Aplikasi".');
+        }
+      });
+
 
       document.getElementById('btnResetDatabase').addEventListener('click', () => {
         localStorage.removeItem('aset_cerdas_silian_raya_v1');
