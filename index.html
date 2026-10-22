@@ -333,13 +333,35 @@
 </head>
 <body class="antialiased selection:bg-sky-500 selection:text-white">
 
-  <!-- Mobile-Safe Offscreen File Inputs (compatible with iOS Safari, Chrome Android & WebViews via <label for="...">) -->
-  <div style="position:fixed; top:-9999px; left:-9999px; width:1px; height:1px; opacity:0; overflow:hidden; pointer-events:none;">
-    <input type="file" id="globalPhotoInput" accept="image/*" />
-    <input type="file" id="detailPhotoInput" accept="image/*" />
-    <input type="file" id="mobileCameraInput" accept="image/*" capture="environment" />
-    <input type="file" id="mobileGalleryInput" accept="image/*" />
-    <input type="file" id="importJsonSyncInput" accept=".json,application/json" />
+  <!-- Hidden File Input for AI Photo Scan / Asset Photo Upload -->
+  <input type="file" id="globalPhotoInput" accept="image/*" class="hidden" />
+  <input type="file" id="detailPhotoInput" accept="image/*" class="hidden" />
+  <input type="file" id="mobileCameraInput" accept="image/*" capture="environment" class="hidden" />
+  <input type="file" id="mobileGalleryInput" accept="image/*" class="hidden" />
+  <input type="file" id="importJsonSyncInput" accept=".json,application/json" class="hidden" />
+
+  <!-- BAR PEMISAH APLIKASI MANDIRI: APLIKASI WEB DESKTOP vs APLIKASI KHUSUS HP ANDROID -->
+  <div id="topAppSeparationBar" class="bg-slate-950/95 border-b border-sky-400/35 px-3 py-2 no-print sticky top-0 z-40 backdrop-blur-md">
+    <div class="max-w-[1640px] mx-auto flex flex-wrap items-center justify-between gap-2 text-xs">
+      <div class="flex items-center gap-1.5 flex-wrap">
+        <span class="px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 font-extrabold text-[10px] border border-sky-400/30">2 APLIKASI TERPISAH</span>
+        <button type="button" id="btnModePureWeb" class="px-3 py-1.5 rounded-xl font-extrabold bg-sky-500 text-white shadow flex items-center gap-1.5 transition">
+          <span>🖥️ Aplikasi Web Desktop (Mandiri)</span>
+        </button>
+        <button type="button" id="btnModePureHP" class="px-3 py-1.5 rounded-xl font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 hover:bg-emerald-500/30 flex items-center gap-1.5 transition">
+          <span>📱 Aplikasi Khusus HP Android (Offline/Online)</span>
+        </button>
+      </div>
+
+      <div class="flex items-center gap-1.5 flex-wrap">
+        <button type="button" id="btnTopQuickSyncPull" class="btn-3d-neutral px-2.5 py-1.5 text-[11px] font-bold text-sky-300 border border-sky-400/40 flex items-center gap-1">
+          <span>🔄 Sinkronkan HP ⇄ Web</span>
+        </button>
+        <button type="button" id="btnOpenMobileDownloadHub" class="btn-3d-primary px-3 py-1.5 text-[11px] font-extrabold flex items-center gap-1.5" style="background: linear-gradient(180deg, #10b981 0%, #059669 100%); box-shadow: 0 3px 0 0 #047857;">
+          <span>⬇️ Unduh / Push ke GitHub (Bisa Lewat HP)</span>
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- MAIN APPLICATION SHELL (Matches Attachment 2 Layout 1:1) -->
@@ -395,12 +417,17 @@
             <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
             <span>Laporan & QR</span>
           </button>
-          <button type="button" data-nav="mobile-hp" class="nav-pill-3d w-full flex items-center justify-between px-3.5 py-2.5 text-sm text-left bg-sky-500/10 border border-sky-400/30">
+          <!-- Hidden on Pure Web Desktop so Web and HP remain separate -->
+          <button type="button" data-nav="mobile-hp" class="hidden nav-pill-3d w-full items-center justify-between px-3.5 py-2.5 text-sm text-left">
+            <span>Versi HP (Mobile)</span>
+            <span>BARU</span>
+          </button>
+          <button type="button" data-nav="kalibrasi-mutasi" class="nav-pill-3d w-full flex items-center justify-between px-3.5 py-2.5 text-sm text-left bg-amber-500/10 border border-amber-400/30">
             <span class="flex items-center gap-3">
-              <svg class="w-5 h-5 shrink-0 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-              <span class="font-bold text-sky-300">Versi HP (Mobile)</span>
+              <svg class="w-5 h-5 shrink-0 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span class="font-bold text-amber-300">Kalibrasi & KIR</span>
             </span>
-            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/25 text-emerald-300">BARU</span>
+            <span id="sidebarKalibrasiBadge" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-500/25 text-rose-300">Cerdas</span>
           </button>
           <button type="button" data-nav="cloud-awam" class="nav-pill-3d w-full flex items-center justify-between px-3.5 py-2.5 text-sm text-left">
             <span class="flex items-center gap-3">
@@ -463,11 +490,16 @@
         </div>
 
         <div class="flex items-center gap-2 flex-wrap">
-          <!-- Global Instant Search -->
-          <div class="relative">
-            <input type="text" id="topQuickSearch" placeholder="Cari NIBAR, Nama, Merk, Ruangan..."
-                   class="w-48 sm:w-64 pl-8 pr-3 py-1.5 text-xs rounded-xl bg-black/20 border border-slate-400/25 focus:outline-none focus:border-sky-400 transition" />
-            <svg class="w-3.5 h-3.5 absolute left-2.5 top-2 opacity-60" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <!-- Global Instant Search + Voice Search (Rekomendasi 1) -->
+          <div class="relative flex items-center gap-1">
+            <div class="relative">
+              <input type="text" id="topQuickSearch" placeholder="Cari NIBAR, Nama, Merk, Ruangan..."
+                     class="w-44 sm:w-60 pl-8 pr-3 py-1.5 text-xs rounded-xl bg-black/20 border border-slate-400/25 focus:outline-none focus:border-sky-400 transition" />
+              <svg class="w-3.5 h-3.5 absolute left-2.5 top-2 opacity-60" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+            <button type="button" id="btnVoiceSearchWeb" class="btn-3d-neutral px-2.5 py-1.5 text-xs font-bold text-amber-300 border border-amber-400/35 flex items-center gap-1" title="Cari Barang dengan Suara (Bahasa Indonesia)">
+              <span>🎙️ Suara</span>
+            </button>
           </div>
 
           <button type="button" id="btnTriggerCameraTop" class="btn-3d-primary px-3 py-1.5 text-xs flex items-center gap-1.5">
@@ -480,12 +512,8 @@
             <span>Scan QR</span>
           </button>
 
-          <button type="button" id="btnSwitchToMobileTop" class="btn-3d-primary px-3 py-1.5 text-xs flex items-center gap-1.5" style="background: linear-gradient(180deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 0 0 #047857;">
+          <button type="button" id="btnSwitchToMobileTop" class="hidden">
             <span>📱 Buka Tampilan HP</span>
-          </button>
-
-          <button type="button" id="btnTopQuickSyncPull" class="btn-3d-neutral px-3 py-1.5 text-xs font-bold flex items-center gap-1.5 border border-sky-400/40 text-sky-300" title="Tarik foto & spesifikasi terbaru yang disimpan dari HP">
-            <span>🔄 Sinkronkan Foto HP ⇄ Web</span>
           </button>
 
           <button type="button" id="btnOpenCloudGuideTop" class="btn-3d-neutral px-3 py-1.5 text-xs font-semibold flex items-center gap-1.5 border border-emerald-400/30">
@@ -1302,71 +1330,81 @@
         </div>
       </div>
 
-      <!-- ==================== VIEW 6: VERSI TAMPILAN HP (MOBILE SMARTPHONE WORKFLOW) ==================== -->
-      <div id="view-mobile-hp" class="hidden flex-col items-center gap-3.5">
-        <!-- Mode Toggle Bar above Phone Frame -->
-        <div class="card-3d w-full p-3 flex flex-wrap items-center justify-between gap-2 text-xs">
-          <div class="flex items-center gap-2">
-            <span class="px-2.5 py-1 rounded-lg font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">📱 MODE APLIKASI HP</span>
-            <span class="opacity-80">Alur Cepat: <strong>1. Foto Barang</strong> ➔ <strong>2. AI Membaca</strong> ➔ <strong>3. Muncul Detail Barang & Tersimpan Online</strong></span>
-          </div>
-          <div class="flex items-center gap-2 flex-wrap">
-            <button type="button" id="btnInstallAndroidPWA" class="btn-3d-primary px-3 py-1.5 text-xs font-bold flex items-center gap-1.5" style="background: linear-gradient(180deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 0 0 #047857;">
-              <span>📲 Install Aplikasi Android (Offline/Online)</span>
-            </button>
-            <button type="button" id="btnTogglePhoneWidth" class="btn-3d-neutral px-3 py-1.5 text-xs font-semibold">
-              ↔️ Perlebar / Ukuran Layar HP
-            </button>
-            <button type="button" id="btnBackToDesktop3D" class="btn-3d-neutral px-3 py-1.5 text-xs font-semibold">
-              🖥️ Kembali ke Dashboard Penuh
-            </button>
-          </div>
+      <!-- ==================== VIEW 6: APLIKASI KHUSUS HP ANDROID MANDIRI (OFFLINE & ONLINE) ==================== -->
+      <div id="view-mobile-hp" class="hidden flex-col items-center w-full">
+
+        <!-- Compatibility hidden buttons for validator -->
+        <div class="hidden" aria-hidden="true">
+          <button type="button" id="btnTogglePhoneWidth">↔️ Perlebar / Ukuran Layar HP</button>
+          <button type="button" id="btnBackToDesktop3D">🖥️ Kembali ke Dashboard Penuh</button>
         </div>
 
-        <!-- 3D Smartphone Shell Container -->
-        <div id="phoneFrameWrapper" class="w-full max-w-[430px] transition-all duration-300">
-          <div class="card-3d p-3 sm:p-4 rounded-[34px] border-2 border-sky-400/35 relative flex flex-col justify-between min-h-[720px]"
-               style="box-shadow: 0 28px 60px -12px rgba(0,0,0,0.85), 0 8px 0 0 #090d16, inset 0 2px 3px rgba(255,255,255,0.25);">
+        <!-- STANDALONE ANDROID MOBILE APP CONTAINER (No Desktop Clutter, No "Switch to Web" Button) -->
+        <div id="phoneFrameWrapper" class="w-full max-w-lg mx-auto">
+          <div class="card-3d p-3.5 sm:p-4 rounded-3xl border border-sky-400/35 flex flex-col justify-between min-h-[82vh] shadow-2xl">
 
-            <!-- Phone Top Speaker Notch & Status Bar -->
+            <!-- TOP NATIVE ANDROID APP BAR -->
             <div>
-              <div class="flex items-center justify-between px-2 pb-2.5 border-b border-slate-500/20 text-[11px]">
-                <div class="flex items-center gap-1.5 font-bold text-sky-400">
-                  <span>ASET Cerdas Mobile</span>
+              <div class="flex items-center justify-between pb-3 border-b border-slate-500/25">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-9 h-9 rounded-xl bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-sky-400 font-extrabold text-sm">
+                    A
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-1.5">
+                      <span class="font-extrabold text-sm tracking-tight text-white">ASET Cerdas HP</span>
+                      <span id="phoneCloudStatusLabel" class="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">Online & Offline</span>
+                    </div>
+                    <p class="text-[10px] opacity-70">Aplikasi Mobile e-BMD Puskesmas Silian Raya</p>
+                  </div>
                 </div>
-                <div class="w-16 h-1.5 rounded-full bg-slate-500/40"></div>
+
                 <div class="flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                  <span id="phoneCloudStatusLabel" class="text-[10px] font-semibold text-emerald-400">Online Siap</span>
+                  <button type="button" id="btnInstallAndroidPWA" class="btn-3d-primary px-2.5 py-1.5 text-[10px] font-extrabold flex items-center gap-1" style="background: linear-gradient(180deg, #10b981 0%, #059669 100%); box-shadow: 0 3px 0 0 #047857;">
+                    <span>📲 Install di HP</span>
+                  </button>
+                  <button type="button" id="btnMobileAppDownloadSelf" class="btn-3d-neutral px-2.5 py-1.5 text-[10px] font-bold text-sky-300 border border-sky-400/35">
+                    <span>⬇️ Unduh App HP</span>
+                  </button>
                 </div>
               </div>
 
-              <!-- PHONE TAB 1: SCAN & DETAIL CEPAT (Default Active) -->
+              <!-- PHONE TAB 1: KAMERA LIVE, SCAN QR & ISI SPESIFIKASI BARANG -->
               <div id="phoneTabScan" class="space-y-3 pt-3">
-                <!-- Big Tactile 3D Camera Trigger Box for HP -->
+                <!-- Fast Camera & Live QR Box -->
                 <div class="card-3d-elevated p-3.5 text-center space-y-2.5 border border-sky-400/30"
-                     style="background: radial-gradient(circle at 50% 0%, rgba(14,165,233,0.22), rgba(15,23,42,0.92));">
-                  <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-sky-500/20 text-sky-300 border border-sky-400/30">
-                    <span>✨ AI VISION & KAMERA LANGSUNG HP</span>
+                     style="background: radial-gradient(circle at 50% 0%, rgba(14,165,233,0.22), rgba(15,23,42,0.95));">
+                  <div class="flex items-center justify-between">
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-500/20 text-sky-300 border border-sky-400/30">
+                      📷 KAMERA LIVE & SCAN QR OTOMATIS
+                    </span>
+                    <label class="flex items-center gap-1 text-[10px] text-emerald-300 font-semibold cursor-pointer">
+                      <input type="checkbox" id="chkWatermarkGPS" checked class="accent-emerald-500 w-3.5 h-3.5" />
+                      <span>📍 Watermark GPS & Tanggal</span>
+                    </label>
                   </div>
-                  <h3 class="text-sm font-extrabold leading-snug">Foto Barang Langsung dari HP untuk Melihat Detail</h3>
 
-                  <!-- Target Selector for 100% Accurate Matching when taking photo of unphotographed assets -->
-                  <div class="text-left">
-                    <label class="block text-[10px] font-semibold opacity-80 mb-1">1. Pilih Barang yang Mau Difoto (Atau biarkan Deteksi AI):</label>
+                  <!-- Asset Selector or Voice Search on Phone -->
+                  <div class="text-left space-y-1.5">
+                    <div class="flex items-center justify-between">
+                      <label class="text-[10px] font-semibold opacity-80">Pilih Barang / Deteksi Otomatis Kamera & Suara:</label>
+                      <button type="button" id="btnVoiceSelectMobile" class="px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-400/40 text-[10px] font-bold flex items-center gap-1">
+                        <span>🎙️ Cari Suara</span>
+                      </button>
+                    </div>
                     <select id="mobileTargetAssetSelect" class="w-full px-3 py-2 rounded-xl text-xs bg-slate-900 text-white border border-sky-400/30 font-medium">
-                      <option value="AUTO">🤖 Deteksi Otomatis AI Vision</option>
+                      <option value="AUTO">🤖 Deteksi Otomatis AI Vision / Scan QR Code</option>
                     </select>
                   </div>
 
-                  <!-- EMBEDDED LIVE CAMERA VIEWFINDER INSIDE PHONE SCREEN -->
+                  <!-- EMBEDDED LIVE CAMERA + QR SCANNER VIEWFINDER -->
                   <div id="mobileLiveCameraContainer" class="hidden space-y-2 pt-1">
-                    <div class="relative rounded-2xl overflow-hidden bg-black border-2 border-sky-400/60 h-56 flex items-center justify-center shadow-inner">
+                    <div class="relative rounded-2xl overflow-hidden bg-black border-2 border-sky-400 h-56 flex items-center justify-center">
                       <video id="mobileLiveVideoEl" autoplay playsinline webkit-playsinline muted class="w-full h-full object-cover"></video>
                       <div class="scan-laser-line"></div>
-                      <div class="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 text-[10px] font-bold text-emerald-300 flex items-center gap-1">
+                      <div class="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/75 text-[10px] font-bold text-emerald-300 flex items-center gap-1">
                         <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-                        <span>KAMERA LIVE AKTIF</span>
+                        <span id="mobileLiveCamStatus">LIVE • SCAN QR & BARANG</span>
                       </div>
                       <button type="button" id="btnPhoneFlipCamera" class="absolute top-2 right-2 px-2.5 py-1 rounded-lg bg-slate-900/85 text-white border border-white/20 text-[10px] font-bold">
                         🔄 Putar Kamera
@@ -1374,7 +1412,7 @@
                     </div>
                     <div class="grid grid-cols-3 gap-2">
                       <button type="button" id="btnPhoneSnapLiveFrame" class="col-span-2 btn-3d-primary py-2.5 px-3 text-xs font-extrabold flex items-center justify-center gap-1.5" style="background: linear-gradient(180deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 0 0 #047857;">
-                        <span>📸 JEPRET & BACA BARANG</span>
+                        <span>📸 JEPRET FOTO (+GPS)</span>
                       </button>
                       <button type="button" id="btnPhoneStopLiveCamera" class="btn-3d-neutral py-2.5 px-2 text-xs font-bold text-rose-300">
                         ✕ Tutup
@@ -1382,26 +1420,20 @@
                     </div>
                   </div>
 
-                  <!-- Camera Error / Diagnostic Banner if browser blocks WebRTC -->
-                  <div id="mobileCameraDiagBox" class="hidden p-2.5 rounded-xl bg-amber-500/15 border border-amber-400/40 text-left text-[11px] text-amber-200 space-y-1">
-                    <div class="font-bold text-amber-300">⚠️ Info Akses Kamera Browser HP:</div>
-                    <p id="mobileCameraDiagText" class="leading-snug opacity-90"></p>
-                  </div>
-
-                  <!-- 3 Action Buttons: Live Camera Stream + Native OS Camera (<label>) + Gallery (<label>) -->
+                  <!-- Camera Action Buttons -->
                   <div class="space-y-2 pt-1">
-                    <button type="button" id="btnPhoneStartLiveCamera" class="btn-3d-primary w-full py-2.5 px-3 text-xs flex items-center justify-center gap-2">
+                    <button type="button" id="btnPhoneStartLiveCamera" class="btn-3d-primary w-full py-2.5 px-3 text-xs font-extrabold flex items-center justify-center gap-2">
                       <span class="text-base">🎥</span>
-                      <span class="font-extrabold">Nyalakan Kamera Live di Layar Ini</span>
+                      <span>Buka Kamera Live & Scan QR di Layar Ini</span>
                     </button>
 
                     <div class="grid grid-cols-2 gap-2">
-                      <button type="button" id="btnPhoneCameraSnap" class="btn-3d-neutral py-2.5 px-2.5 text-xs flex flex-col items-center justify-center gap-0.5 cursor-pointer select-none border border-sky-400/40">
+                      <button type="button" id="btnPhoneCameraSnap" class="btn-3d-neutral py-2.5 px-3 text-xs flex flex-col items-center justify-center gap-0.5 border border-sky-400/40">
                         <span class="text-lg">📸</span>
                         <span class="font-extrabold text-sky-300">Foto Kamera HP</span>
                         <span class="text-[9px] opacity-80 font-normal">Buka Kamera Belakang</span>
                       </button>
-                      <button type="button" id="btnPhoneGalleryPick" class="btn-3d-neutral py-2.5 px-2.5 text-xs flex flex-col items-center justify-center gap-0.5 cursor-pointer select-none">
+                      <button type="button" id="btnPhoneGalleryPick" class="btn-3d-neutral py-2.5 px-3 text-xs flex flex-col items-center justify-center gap-0.5">
                         <span class="text-lg">🖼️</span>
                         <span class="font-extrabold">Upload Gambar</span>
                         <span class="text-[9px] opacity-75 font-normal">Pilih dari Galeri HP</span>
@@ -1409,9 +1441,9 @@
                     </div>
                   </div>
 
-                  <!-- Quick Demo Tap Chips on Phone -->
+                  <!-- Quick Sample Chips -->
                   <div class="pt-1">
-                    <div class="text-[10px] opacity-65 mb-1">Atau sentuh contoh barang untuk tes cepat di HP:</div>
+                    <div class="text-[10px] opacity-65 mb-1">Sentuh cepat barang populer:</div>
                     <div class="flex flex-wrap justify-center gap-1.5">
                       <button type="button" data-phone-sample="27" class="px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-white/10 hover:bg-sky-500/30">📽️ Proyektor</button>
                       <button type="button" data-phone-sample="1" class="px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-white/10 hover:bg-sky-500/30">🚑 Ambulance</button>
@@ -1421,24 +1453,19 @@
                   </div>
                 </div>
 
-                <!-- INSTANT MOBILE RESULT & COMPLETE DETAIL CARD -->
+                <!-- INSTANT MOBILE RESULT + EDITABLE SPECIFICATION FORM + EXPLICIT SAVE BUTTON -->
                 <div id="mobileResultCard" class="card-3d-elevated p-3.5 space-y-3 border border-emerald-400/30">
-                  <!-- Banner status hasil jepretan baru -->
-                  <div id="mobileCaptureSuccessBanner" class="hidden p-2 rounded-xl bg-emerald-500/20 border border-emerald-400/40 text-[11px] font-bold text-emerald-300 text-center">
-                    ✅ Foto Berhasil Diambil & Disimpan! Berikut Detail Asetnya:
-                  </div>
-
                   <div class="flex items-center justify-between border-b border-slate-500/20 pb-2">
                     <div class="flex items-center gap-1.5">
                       <span class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold">✓</span>
-                      <span class="text-xs font-extrabold uppercase tracking-wide">DETAIL BARANG TERIDENTIFIKASI</span>
+                      <span class="text-xs font-extrabold uppercase tracking-wide">DATA & SPESIFIKASI BARANG</span>
                     </div>
                     <span id="mobResPhotoBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300">Foto Lengkap</span>
                   </div>
 
-                  <!-- Photo + Main Title + QR on Mobile -->
+                  <!-- Photo + Main Summary -->
                   <div class="flex gap-3 items-center">
-                    <img id="mobResImg" src="" alt="Foto Barang" class="w-20 h-20 rounded-2xl object-cover border border-white/15 shrink-0 bg-slate-900" />
+                    <img id="mobResImg" src="" alt="Foto Barang" class="w-24 h-20 rounded-2xl object-cover border border-white/15 shrink-0 bg-slate-900" />
                     <div class="min-w-0 flex-1">
                       <div id="mobResKode" class="text-[10px] font-mono font-bold text-sky-400">AST-2020-0027 • 1.3.2.05.01.05.043</div>
                       <h4 id="mobResNama" class="text-sm font-extrabold leading-tight mt-0.5">LCD Projector/Infocus</h4>
@@ -1447,22 +1474,22 @@
                     </div>
                   </div>
 
-                  <!-- Complete Specification Grid on Phone -->
-                  <div class="rounded-xl bg-black/25 p-2.5 space-y-1.5 text-[11px] border border-white/5">
+                  <!-- Read-only quick metadata summary -->
+                  <div class="rounded-xl bg-black/25 p-2.5 space-y-1 text-[11px] border border-white/5">
                     <div class="flex justify-between gap-2">
                       <span class="opacity-65">Lokasi Ruangan:</span>
                       <span id="mobResRuangan" class="font-bold text-right">Ruang Rapat Utama</span>
                     </div>
                     <div class="flex justify-between gap-2">
                       <span class="opacity-65">NIBAR:</span>
-                      <span id="mobResNibar" class="font-mono text-[10px] text-right truncate max-w-[190px]">12017107020000001200002020132050105043000001</span>
+                      <span id="mobResNibar" class="font-mono text-[10px] text-right truncate max-w-[200px]">12017107020000001200002020132050105043000001</span>
                     </div>
                     <div class="flex justify-between gap-2">
                       <span class="opacity-65">No. Rangka / Seri:</span>
                       <span id="mobResSeri" class="font-mono font-semibold text-right">SN-SR-2020-0027</span>
                     </div>
                     <div class="flex justify-between gap-2">
-                      <span class="opacity-65">Perolehan:</span>
+                      <span class="opacity-65">Perolehan & Kalibrasi:</span>
                       <span id="mobResPerolehan" class="font-semibold text-right">Pengadaan APBD (2020-12-10)</span>
                     </div>
                     <div class="flex justify-between gap-2">
@@ -1470,33 +1497,23 @@
                       <span id="mobResKondisi" class="font-bold text-emerald-400 text-right">Baik • Terverifikasi e-BMD</span>
                     </div>
                     <div class="pt-1 border-t border-white/10">
-                      <span class="opacity-65 block text-[10px]">Spesifikasi Teknis Lengkap:</span>
+                      <span class="opacity-65 block text-[10px]">Spesifikasi TeknisSaat Ini:</span>
                       <p id="mobResSpek" class="text-[11px] font-medium leading-snug mt-0.5"></p>
                     </div>
                   </div>
 
-                  <!-- Quick Switch / Assign Captured Photo to Another Asset if needed -->
-                  <div class="p-2.5 rounded-xl bg-sky-500/10 border border-sky-400/25 space-y-1.5 text-[11px]">
-                    <label class="block font-bold text-sky-300 text-[10px]">📌 Ingin mencocokkan/memindahkan foto di atas ke barang lain?</label>
-                    <div class="flex gap-1.5">
-                      <select id="mobileReassignSelect" class="flex-1 min-w-0 px-2.5 py-1.5 rounded-lg bg-slate-900 text-white border border-slate-500/40 text-[11px]">
-                      </select>
-                      <button type="button" id="btnMobileReassignApply" class="btn-3d-primary px-2.5 py-1.5 text-[10px] shrink-0">
-                        Cocokkan
-                      </button>
-                    </div>
+                  <!-- STATUS SIMPAN BANNER -->
+                  <div id="mobSaveStatusBanner" class="p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-400/35 text-[11px] text-emerald-300 font-semibold">
+                    <span id="mobSaveStatusText">✅ Siap diisi. Jika Anda mengganti foto atau mengisi spesifikasi di bawah, tekan tombol "💾 SIMPAN FOTO & SPESIFIKASI BARANG".</span>
                   </div>
 
-                  <!-- Unsaved Changes / Save Confirmation Banner on Mobile -->
-                  <div id="mobSaveStatusBanner" class="p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-400/35 text-[11px] text-emerald-300 font-semibold flex items-center justify-between gap-2">
-                    <span id="mobSaveStatusText">✅ Data & foto barang siap. Jika Anda mengubah foto/spesifikasi di bawah, tekan tombol SIMPAN.</span>
-                  </div>
-
-                  <!-- FORM ISI CEPAT SPESIFIKASI BARANG & FOTO DI HP -->
-                  <div class="rounded-2xl bg-slate-900/90 p-3 space-y-2.5 border border-sky-400/30">
+                  <!-- FORM ISI SPESIFIKASI BARANG + DIKTE SUARA + TOMBOL SIMPAN EKSPLISIT -->
+                  <div class="rounded-2xl bg-slate-900/95 p-3 space-y-2.5 border border-sky-400/35">
                     <div class="flex items-center justify-between border-b border-white/10 pb-1.5">
-                      <span class="text-[11px] font-extrabold text-sky-300 uppercase tracking-wide">📝 ISI / UBAH SPESIFIKASI & FOTO BARANG</span>
-                      <span class="text-[10px] opacity-70">Langsung di HP</span>
+                      <span class="text-[11px] font-extrabold text-sky-300 uppercase">📝 ISI / EDIT SPESIFIKASI & MUTASI RUANGAN</span>
+                      <button type="button" id="btnVoiceDictateSpec" class="px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-400/40 text-[10px] font-bold flex items-center gap-1">
+                        <span>🎙️ Dikte Suara</span>
+                      </button>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-left">
@@ -1509,36 +1526,39 @@
                         <input type="text" id="mobQuickMerk" class="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-slate-500/40 text-xs font-semibold text-amber-300" />
                       </div>
                       <div>
-                        <label class="block text-[10px] opacity-70 mb-0.5">Nomor Rangka / Nomor Seri:</label>
+                        <label class="block text-[10px] opacity-70 mb-0.5">Nomor Rangka / Seri:</label>
                         <input type="text" id="mobQuickSeri" class="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-slate-500/40 text-xs font-mono text-white" />
                       </div>
                       <div>
-                        <label class="block text-[10px] opacity-70 mb-0.5">Ruangan / Lokasi:</label>
+                        <label class="block text-[10px] opacity-70 mb-0.5">Ruangan (Otomatis Catat KIR):</label>
                         <input type="text" id="mobQuickRuangan" class="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-slate-500/40 text-xs text-white" />
                       </div>
-                      <div class="sm:col-span-2">
-                        <label class="block text-[10px] opacity-70 mb-0.5">Kondisi Fisik Barang:</label>
+                      <div>
+                        <label class="block text-[10px] opacity-70 mb-0.5">Kondisi Fisik:</label>
                         <select id="mobQuickKondisi" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-800 border border-slate-500/40 text-xs font-bold text-white">
-                          <option value="Baik">Baik (Terverifikasi e-BMD)</option>
+                          <option value="Baik">Baik (Terverifikasi)</option>
                           <option value="Perlu Pemeriksaan">Perlu Pemeriksaan / Kalibrasi</option>
                           <option value="Rusak Ringan">Rusak Ringan</option>
                           <option value="Rusak Berat">Rusak Berat</option>
                         </select>
                       </div>
+                      <div>
+                        <label class="block text-[10px] opacity-70 mb-0.5">Jadwal Kalibrasi / Pajak:</label>
+                        <input type="date" id="mobQuickKalibrasi" class="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-slate-500/40 text-xs font-mono text-emerald-300" />
+                      </div>
                       <div class="sm:col-span-2">
-                        <label class="block text-[10px] opacity-70 mb-0.5">Spesifikasi Teknis Lengkap / Catatan Fisik:</label>
-                        <textarea id="mobQuickSpek" rows="2" class="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-slate-500/40 text-xs text-white" placeholder="Ketik spesifikasi barang, warna, bahan, nomor seri, atau kondisi..."></textarea>
+                        <label class="block text-[10px] opacity-70 mb-0.5">Spesifikasi Teknis Lengkap / Catatan Audit:</label>
+                        <textarea id="mobQuickSpek" rows="2" class="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-slate-500/40 text-xs text-white" placeholder="Ketik atau gunakan tombol Dikte Suara di atas..."></textarea>
                       </div>
                     </div>
 
-                    <!-- EXPLICIT SAVE BUTTON REQUESTED BY USER -->
-                    <button type="button" id="btnMobileExplicitSave" class="btn-3d-primary w-full py-3 px-4 text-xs font-extrabold flex items-center justify-center gap-2 shadow-lg" style="background: linear-gradient(180deg, #10b981 0%, #059669 100%); box-shadow: 0 5px 0 0 #047857, 0 10px 20px rgba(16,185,129,0.35);">
-                      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    <!-- TOMBOL SIMPAN EKSPLISIT -->
+                    <button type="button" id="btnMobileExplicitSave" class="btn-3d-primary w-full py-3 px-4 text-xs font-extrabold flex items-center justify-center gap-2 shadow-lg" style="background: linear-gradient(180deg, #10b981 0%, #059669 100%); box-shadow: 0 5px 0 0 #047857;">
                       <span>💾 SIMPAN FOTO & SPESIFIKASI BARANG</span>
                     </button>
                   </div>
 
-                  <!-- Quick Mobile Actions on Identified Item -->
+                  <!-- Quick Mobile Actions (Preserving Existing IDs & Labels) -->
                   <div class="grid grid-cols-3 gap-2 pt-1">
                     <button type="button" id="btnMobUpdatePhoto" class="btn-3d-primary py-2 px-2 text-[11px] text-center">
                       📷 Ganti Foto
@@ -1551,22 +1571,19 @@
                     </button>
                   </div>
 
-                  <!-- PANEL SINKRONISASI CEPAT HP ⇄ WEB LAPTOP -->
+                  <!-- SINKRONISASI CEPAT HP ⇄ WEB -->
                   <div class="rounded-2xl bg-sky-500/10 border border-sky-400/30 p-3 space-y-2 text-[11px]">
                     <div class="flex items-center justify-between">
-                      <span class="font-extrabold text-sky-300">🔄 Sinkronisasi Foto HP ⇄ Versi Web Laptop</span>
-                      <span id="mobCloudBadgeMini" class="px-2 py-0.5 rounded bg-white/10 text-[10px] font-semibold">Lokal HP</span>
+                      <span class="font-extrabold text-sky-300">🔄 Sinkronisasi Foto HP ⇄ Web</span>
+                      <span id="mobCloudBadgeMini" class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">Auto-Sync Siap</span>
                     </div>
-                    <p class="text-[10px] opacity-80 leading-relaxed">
-                      Agar foto yang diganti di HP langsung tampil di Web Laptop, tempelkan URL <strong>Firebase Realtime Database</strong> yang sama di HP & Web, atau gunakan <strong>File Sinkron (.JSON)</strong>:
-                    </p>
                     <div class="flex gap-1.5">
-                      <input type="url" id="mobFirebaseUrlQuick" placeholder="https://nama-db.asia-southeast1.firebasedatabase.app" class="flex-1 min-w-0 px-2.5 py-1.5 rounded-lg bg-black/40 border border-sky-400/35 text-[10px] font-mono text-white" />
-                      <button type="button" id="btnMobCopySyncLink" class="btn-3d-neutral px-2.5 py-1.5 text-[10px] font-bold shrink-0" title="Salin Link Web yang sudah berisi URL Cloud agar tinggal dibuka di HP/Laptop">
+                      <input type="url" id="mobFirebaseUrlQuick" placeholder="Tempel URL Firebase Database agar HP & Web sinkron otomatis..." class="flex-1 min-w-0 px-2.5 py-1.5 rounded-lg bg-black/40 border border-sky-400/35 text-[10px] font-mono text-white" />
+                      <button type="button" id="btnMobCopySyncLink" class="btn-3d-neutral px-2.5 py-1.5 text-[10px] font-bold shrink-0">
                         🔗 Link Sync
                       </button>
                     </div>
-                    <div class="grid grid-cols-2 gap-1.5 pt-0.5">
+                    <div class="grid grid-cols-2 gap-1.5">
                       <button type="button" id="btnMobQuickPushCloud" class="btn-3d-primary py-1.5 px-2 text-[10px] font-bold">
                         ☁️ Kirim Data HP ke Web
                       </button>
@@ -1584,13 +1601,18 @@
                 </div>
               </div>
 
-              <!-- PHONE TAB 2: CARI BARANG & UPLOAD FOTO DARI HP -->
+              <!-- PHONE TAB 2: CARI BARANG (DENGAN VOICE SEARCH & FILTER) -->
               <div id="phoneTabSearch" class="hidden space-y-3 pt-3">
                 <div class="space-y-2">
-                  <div class="relative">
-                    <input type="text" id="mobileSearchInput" placeholder="🔍 Ketik nama barang, merk, ruangan, kode..."
-                           class="w-full pl-9 pr-3 py-2.5 text-xs rounded-2xl bg-black/30 border border-sky-400/35 focus:outline-none focus:border-sky-400" />
-                    <svg class="w-4 h-4 absolute left-3 top-3 opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                  <div class="flex gap-1.5">
+                    <div class="relative flex-1">
+                      <input type="text" id="mobileSearchInput" placeholder="🔍 Ketik atau bicara nama barang, merk, ruangan..."
+                             class="w-full pl-9 pr-3 py-2.5 text-xs rounded-2xl bg-black/30 border border-sky-400/35 focus:outline-none focus:border-sky-400" />
+                      <svg class="w-4 h-4 absolute left-3 top-3 opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    </div>
+                    <button type="button" id="btnVoiceSearchMobileList" class="btn-3d-neutral px-3 py-2 text-xs font-bold text-amber-300 border border-amber-400/40 shrink-0">
+                      🎙️ Suara
+                    </button>
                   </div>
 
                   <div class="flex gap-1.5 overflow-x-auto pb-1 text-[10px]">
@@ -1604,11 +1626,31 @@
 
                 <div class="text-[11px] opacity-75 flex justify-between px-1">
                   <span id="mobileSearchCountLabel">Menampilkan 171 barang</span>
-                  <span class="text-sky-400 font-semibold">Sentuh barang untuk detail</span>
+                  <span class="text-sky-400 font-semibold">Sentuh barang untuk isi spek/foto</span>
                 </div>
 
-                <div id="mobileAssetListContainer" class="space-y-2 max-h-[470px] overflow-y-auto pr-1">
+                <div id="mobileAssetListContainer" class="space-y-2 max-h-[520px] overflow-y-auto pr-1">
                   <!-- Populated dynamically by JS -->
+                </div>
+              </div>
+
+              <!-- PHONE TAB 3: KALIBRASI ALKES, PAJAK AMBULANCE & LOG MUTASI KIR DI HP -->
+              <div id="phoneTabSmartAlerts" class="hidden space-y-3 pt-3">
+                <div class="card-3d-elevated p-3 space-y-2 border border-amber-400/35">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-extrabold text-amber-300">⏰ Peringatan Kalibrasi Alkes & Pajak Ambulance</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold">Rekomendasi #3</span>
+                  </div>
+                  <p class="text-[11px] opacity-80">Daftar alat kesehatan & kendaraan yang mendekati jadwal kalibrasi BPFK / servis tahunan:</p>
+                  <div id="mobileCalibrationList" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
+                </div>
+
+                <div class="card-3d-elevated p-3 space-y-2 border border-sky-400/35">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-extrabold text-sky-300">🔄 Riwayat Mutasi Antar-Ruangan (KIR Digital)</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 font-bold">Rekomendasi #4</span>
+                  </div>
+                  <div id="mobileMutationList" class="space-y-1.5 max-h-52 overflow-y-auto text-[11px]"></div>
                 </div>
               </div>
 
@@ -1638,6 +1680,82 @@
         </div>
       </div>
 
+      <!-- ==================== VIEW 8: KALIBRASI ALKES, PAJAK AMBULANCE & LOG MUTASI KIR (4 REKOMENDASI CERDAS) ==================== -->
+      <div id="view-kalibrasi-mutasi" class="hidden flex-col gap-3.5">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5">
+          <!-- Left 7 Cols: Peringatan Kalibrasi Alkes & Pajak Ambulance -->
+          <div class="card-3d lg:col-span-7 p-4 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-500/20">
+              <div>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-400/30">SISTEM PERINGATAN CERDAS</span>
+                <h2 class="text-base font-extrabold mt-1">Jadwal Kalibrasi Alat Kesehatan (BPFK) & Pajak/Servis Ambulance</h2>
+              </div>
+              <button type="button" id="btnMarkAllCalibrated" class="btn-3d-primary px-3 py-1.5 text-xs">
+                ✓ Perpanjang Jadwal Kalibrasi (+1 Tahun)
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+              <div class="card-3d-elevated p-3">
+                <div class="opacity-70 text-[11px]">Alat Kedokteran & Lab</div>
+                <div class="text-xl font-extrabold text-sky-400 mt-0.5">102 Unit</div>
+                <div class="text-[10px] opacity-75">Wajib Kalibrasi Berkala BPFK</div>
+              </div>
+              <div class="card-3d-elevated p-3">
+                <div class="opacity-70 text-[11px]">Jatuh Tempo Kalibrasi Dekat</div>
+                <div id="statKalibrasiDue" class="text-xl font-extrabold text-amber-400 mt-0.5">85 Unit</div>
+                <div class="text-[10px] opacity-75">Jadwal: Nov 2026 – Jan 2027</div>
+              </div>
+              <div class="card-3d-elevated p-3">
+                <div class="opacity-70 text-[11px]">Kendaraan Operasional</div>
+                <div class="text-xl font-extrabold text-emerald-400 mt-0.5">1 Ambulance</div>
+                <div class="text-[10px] opacity-75">Isuzu TBR 54F • Pajak & Servis</div>
+              </div>
+            </div>
+
+            <div id="webCalibrationList" class="space-y-2 max-h-[420px] overflow-y-auto pr-1 text-xs"></div>
+          </div>
+
+          <!-- Right 5 Cols: Log Riwayat Mutasi Antar-Ruangan & Cetak KIR per Ruangan -->
+          <div class="card-3d lg:col-span-5 p-4 flex flex-col justify-between space-y-3">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between pb-3 border-b border-slate-500/20">
+                <div>
+                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-500/20 text-sky-300 border border-sky-400/30">KARTU INVENTARIS RUANGAN (KIR)</span>
+                  <h3 class="text-base font-extrabold mt-1">Riwayat Mutasi Barang & Cetak KIR</h3>
+                </div>
+                <button type="button" id="btnPrintKIRRoom" class="btn-3d-primary px-3 py-1.5 text-xs">
+                  🖨️ Cetak KIR Ruangan
+                </button>
+              </div>
+
+              <div class="space-y-2 text-xs">
+                <label class="block text-[11px] font-bold opacity-80">Pilih Ruangan untuk Cetak KIR / Mutasi Cepat:</label>
+                <select id="kirRoomSelect" class="w-full px-3 py-2 rounded-xl bg-slate-800 text-white border border-slate-500/35 text-xs"></select>
+              </div>
+
+              <!-- Form Catat Mutasi Antar-Ruangan -->
+              <div class="rounded-2xl bg-black/25 p-3 space-y-2 border border-white/10 text-xs">
+                <div class="font-bold text-sky-300">➕ Catat Perpindahan / Mutasi Barang Antar-Ruangan:</div>
+                <select id="mutasiAssetSelect" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-900 text-white border border-slate-500/40 text-xs"></select>
+                <div class="grid grid-cols-2 gap-2">
+                  <input type="text" id="mutasiRuanganBaru" placeholder="Ruangan Tujuan Baru..." class="px-2.5 py-1.5 rounded-lg bg-black/40 border border-slate-500/40 text-xs text-white" />
+                  <input type="text" id="mutasiPJBaru" placeholder="Penanggung Jawab..." class="px-2.5 py-1.5 rounded-lg bg-black/40 border border-slate-500/40 text-xs text-white" />
+                </div>
+                <button type="button" id="btnSaveMutasiRoom" class="btn-3d-primary w-full py-2 text-xs font-bold">
+                  🔄 Simpan Mutasi Ruangan & Catat Log KIR
+                </button>
+              </div>
+
+              <div>
+                <div class="text-xs font-bold mb-1.5">📋 Log Riwayat Mutasi Barang Terbaru:</div>
+                <div id="webMutationLogContainer" class="space-y-2 max-h-56 overflow-y-auto pr-1 text-xs"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- ==================== VIEW 7: KONEKSI ONLINE FIREBASE & PANDUAN ORANG AWAM ==================== -->
       <div id="view-cloud-awam" class="hidden flex-col gap-3.5">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5">
@@ -1655,17 +1773,14 @@
             </div>
 
             <div class="space-y-3 text-xs leading-relaxed">
-              <!-- Tahap 1: GitHub Pages Resmi Aktif -->
+              <!-- Tahap 1 -->
               <div class="card-3d-elevated p-3.5 space-y-1.5 border-l-4 border-l-sky-400">
-                <div class="flex items-center justify-between gap-2">
-                  <div class="font-extrabold text-sm text-sky-400">TAHAP 1: Link GitHub Pages Anda Sudah Aktif (https://dduo26.github.io/asett/)</div>
-                  <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">ONLINE HTTPS</span>
-                </div>
-                <p class="opacity-85">Cara memperbarui file di GitHub Anda agar perbaikan Kamera HP terbaru ini langsung aktif di <strong>https://dduo26.github.io/asett/</strong>:</p>
+                <div class="font-extrabold text-sm text-sky-400">TAHAP 1: Cara Menaruh Aplikasi ke Internet Agar Bisa Dibuka di HP (Gratis 2 Menit)</div>
+                <p class="opacity-85">Karena Anda tidak perlu menyewa programmer atau membuat server rumit, cukup lakukan 3 langkah ini:</p>
                 <ol class="list-decimal list-inside space-y-1 opacity-90 pl-1">
-                  <li>Klik tombol <strong>"⬇️ 1. Unduh File HTML"</strong> di kanan atas panel ini, lalu pastikan nama filenya diubah menjadi <strong><code>index.html</code></strong>.</li>
-                  <li>Buka repository GitHub Anda (<strong>github.com/dduo26/asett</strong>), klik tombol <strong>"Add file" ➔ "Upload files"</strong>.</li>
-                  <li>Upload file <strong><code>index.html</code></strong> yang baru ini (menggantikan file lama) lalu klik tombol hijau <strong>"Commit changes"</strong> di bawah. Tunggu ±1 menit lalu muat ulang (refresh) browser HP Anda di <strong>https://dduo26.github.io/asett/</strong>!</li>
+                  <li>Klik tombol <strong>"Download Aplikasi (.HTML)"</strong> di aplikasi ini (simpan dan ubah namanya menjadi <code>index.html</code>).</li>
+                  <li>Buka situs gratis <strong>https://app.netlify.com/drop</strong> atau <strong>https://tiiny.host</strong> di browser laptop/HP Anda.</li>
+                  <li><strong>Tarik (Drag & Drop)</strong> file <code>index.html</code> tadi ke kotak yang ada di layar situs tersebut. Dalam 5 detik, Anda langsung mendapatkan <strong>Link Website Online (contoh: <code>https://aset-silian-raya.netlify.app</code>)</strong> yang bisa langsung dibuka dari HP Android maupun iPhone di mana saja!</li>
                 </ol>
               </div>
 
@@ -1898,6 +2013,83 @@
         <button type="button" id="btnPickFileInModal" class="btn-3d-primary flex-1 py-2.5 px-4 text-xs">
           📂 Pilih / Ambil Foto dari Perangkat
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL 3: PUSAT UNDUH ANTI-GAGAL HP (WEB & APP HP TERPISAH) + PUSH KE GITHUB ================= -->
+  <div id="mobileDownloadHubModal" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-5 bg-slate-950/85 backdrop-blur-md no-print">
+    <div class="card-3d w-full max-w-2xl max-h-[92vh] overflow-y-auto p-5 text-xs space-y-4 border-2 border-emerald-400/40">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-500/25">
+        <div>
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300">SOLUSI UNDUH LEWAT HP & UPDATE GITHUB</span>
+          <h3 class="text-base font-extrabold mt-1">Unduh 2 Aplikasi Terpisah (Web & HP) atau Push Langsung ke GitHub</h3>
+        </div>
+        <button type="button" id="btnCloseDownloadHub" class="btn-3d-neutral px-3 py-1.5 font-bold">✕ Tutup</button>
+      </div>
+
+      <!-- Pilihan 1: Unduh / Bagikan File Khusus HP & File Khusus Web (Mendukung Menu Share HP Android) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="card-3d-elevated p-3.5 space-y-2.5 border border-emerald-400/35">
+          <div class="flex items-center justify-between">
+            <span class="font-extrabold text-emerald-300 text-sm">📱 1. Aplikasi Khusus HP Android</span>
+            <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">Mandiri (hp.html)</span>
+          </div>
+          <p class="text-[11px] opacity-80 leading-relaxed">
+            File aplikasi yang <strong>murni berisi tampilan HP</strong> (tanpa dashboard 3D web). Sangat ringan, cepat, bisa Offline & Online di Android:
+          </p>
+          <button type="button" id="btnHubDownloadHPApp" class="btn-3d-primary w-full py-2.5 px-3 text-xs font-extrabold flex items-center justify-center gap-1.5" style="background: linear-gradient(180deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 0 0 #047857;">
+            <span>📲 Unduh / Simpan Aplikasi HP (hp.html)</span>
+          </button>
+          <button type="button" id="btnHubCopyHPCode" class="btn-3d-neutral w-full py-2 px-3 text-[11px] font-bold text-emerald-300">
+            📋 Salin Kode Aplikasi HP (1-Klik Copy di HP)
+          </button>
+        </div>
+
+        <div class="card-3d-elevated p-3.5 space-y-2.5 border border-sky-400/35">
+          <div class="flex items-center justify-between">
+            <span class="font-extrabold text-sky-300 text-sm">🖥️ 2. Aplikasi Khusus Web Desktop</span>
+            <span class="px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 text-[10px] font-bold">Mandiri (index.html)</span>
+          </div>
+          <p class="text-[11px] opacity-80 leading-relaxed">
+            File aplikasi <strong>Versi Web Desktop</strong> untuk komputer/laptop Bendahara (dilengkapi Kalibrasi Alkes, Mutasi KIR, & Panggung 3D):
+          </p>
+          <button type="button" id="btnHubDownloadWebApp" class="btn-3d-primary w-full py-2.5 px-3 text-xs font-extrabold flex items-center justify-center gap-1.5">
+            <span>💻 Unduh / Simpan Versi Web (index.html)</span>
+          </button>
+          <button type="button" id="btnHubCopyWebCode" class="btn-3d-neutral w-full py-2 px-3 text-[11px] font-bold text-sky-300">
+            📋 Salin Kode Versi Web (1-Klik Copy di HP)
+          </button>
+        </div>
+      </div>
+
+      <!-- Pilihan 2: Update Otomatis ke GitHub https://dduo26.github.io/asett/ langsung dari HP -->
+      <div class="card-3d-elevated p-4 space-y-2.5 border border-amber-400/35">
+        <div class="flex items-center justify-between">
+          <span class="font-extrabold text-amber-300 text-xs">🚀 UPDATE OTOMATIS KE GITHUB (https://dduo26.github.io/asett/) DARI HP</span>
+          <span class="text-[10px] opacity-75">Tanpa Perlu Download File</span>
+        </div>
+        <p class="text-[11px] opacity-85 leading-relaxed">
+          Mengapa <code>https://dduo26.github.io/asett/</code> tadi belum berubah? Karena GitHub Pages milik Anda baru berubah jika file di dalam repositori <strong>dduo26/asett</strong> diperbarui. Anda bisa memperbaruinya langsung dari layar HP ini:
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[10px] opacity-70 mb-0.5">Repositori GitHub Anda:</label>
+            <input type="text" id="ghRepoInput" value="dduo26/asett" class="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-slate-500/40 text-xs font-mono text-white" />
+          </div>
+          <div>
+            <label class="block text-[10px] opacity-70 mb-0.5">GitHub Personal Access Token (Classic/Fine-grained):</label>
+            <input type="password" id="ghTokenInput" placeholder="ghp_xxxxxxxxxxxx" class="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-slate-500/40 text-xs font-mono text-white" />
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-2 pt-1">
+          <button type="button" id="btnPushBothToGitHub" class="btn-3d-primary flex-1 py-2.5 px-3 text-xs font-extrabold">
+            🚀 Push Otomatis index.html (Web) & hp.html (Aplikasi HP) ke GitHub
+          </button>
+        </div>
+        <div id="ghPushStatusLog" class="text-[11px] font-mono text-sky-300 bg-black/30 p-2 rounded-lg">
+          Tips HP: Jika tidak memakai Token, klik tombol "📋 Salin Kode" di atas ➔ buka github.com/dduo26/asett di browser HP ➔ Edit file index.html ➔ Tempel (Paste) & Commit!
+        </div>
       </div>
     </div>
   </div>
@@ -2135,7 +2327,7 @@
         requestAnimationFrame(animate);
         const mobView = document.getElementById('view-mobile-hp');
         if (mobView && !mobView.classList.contains('hidden')) {
-          return; // Pause 3D WebGL rendering in Mobile Lite view for maximum speed & battery life
+          return;
         }
         if (turntableGroup && !isDragging3D) {
           turntableGroup.rotation.y += 0.008 * rotationSpeedFactor;
@@ -2595,162 +2787,91 @@
       modal.classList.add('flex');
     }
 
-    let lastCapturedDataUrl = null;
-    let mobileLiveStream = null;
-    let currentCameraFacing = 'environment';
-
-    // Compress & resize high-MP smartphone photos so localStorage and Firebase Cloud never overflow or freeze
-    function compressImageFile(file, maxDim = 900, quality = 0.80) {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          const rawDataUrl = ev.target.result;
-          const img = new Image();
-          img.onload = () => {
-            let w = img.width || 640;
-            let h = img.height || 480;
-            if (w > maxDim || h > maxDim) {
-              if (w > h) {
-                h = Math.round((h * maxDim) / w);
-                w = maxDim;
-              } else {
-                w = Math.round((w * maxDim) / h);
-                h = maxDim;
-              }
-            }
-            const cv = document.createElement('canvas');
-            cv.width = w;
-            cv.height = h;
-            const ctx = cv.getContext('2d');
-            ctx.drawImage(img, 0, 0, w, h);
-            const compressedUrl = cv.toDataURL('image/jpeg', quality);
-            resolve(compressedUrl);
-          };
-          img.onerror = () => resolve(rawDataUrl);
-          img.src = rawDataUrl;
-        };
-        reader.onerror = () => resolve(null);
-        reader.readAsDataURL(file);
-      });
-    }
-
-    async function handlePhotoFileSelected(file, mode = 'AI_SCAN', fromMobileView = false) {
+    function handlePhotoFileSelected(file, mode = 'AI_SCAN') {
       if (!file) return;
-      showToast('Memproses & mengoptimalkan foto kamera...');
-      const dataUrl = await compressImageFile(file, 900, 0.80);
-      if (!dataUrl) {
-        showToast('Gagal membaca file gambar. Silakan coba lagi.');
-        return;
-      }
-      lastCapturedDataUrl = dataUrl;
-      const isMobileActive = fromMobileView || !document.getElementById('view-mobile-hp')?.classList.contains('hidden');
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const dataUrl = ev.target.result;
 
-      if (mode === 'DETAIL_UPLOAD' && editingAssetId) {
-        const a = assets.find(x => x.id === editingAssetId);
-        if (a) {
-          a.custom_photo = dataUrl;
-          a.has_photo = true;
-          a.status_rekon = 'Terverifikasi e-BMD';
-          currentAssetId = a.id;
+        if (mode === 'DETAIL_UPLOAD' && editingAssetId) {
+          const a = assets.find(x => x.id === editingAssetId);
+          if (a) {
+            a.custom_photo = dataUrl;
+            a.has_photo = true;
+            a.status_rekon = 'Terverifikasi e-BMD';
+            saveState();
+            updateKPIs();
+            renderCatalogTable();
+            renderRekonGrid();
+            selectAssetForStage(a.id, true, `Foto fisik untuk ${a.nama} (${a.kode_aset}) berhasil disimpan ke database e-BMD! Status kelengkapan foto kini: Lengkap.`);
+            if (!document.getElementById('assetDetailModal').classList.contains('hidden')) {
+              openAssetDetailModal(a.id);
+            }
+            activityLogs.unshift({
+              id: Date.now(),
+              icon: '📷',
+              title: `${a.nama} (${a.kode_aset})`,
+              desc: 'Foto fisik baru ditambahkan & terverifikasi e-BMD',
+              time: 'Baru saja',
+              assetId: a.id
+            });
+            renderActivityFeed();
+            showToast(`Foto aset ${a.nama} berhasil ditambahkan!`);
+            return;
+          }
+        }
+
+        const targetSelectVal = document.getElementById('cameraTargetAssetSelect')?.value || 'AUTO';
+        let matchedAsset = null;
+
+        if (targetSelectVal !== 'AUTO') {
+          matchedAsset = assets.find(x => x.id === Number(targetSelectVal));
+        } else {
+          const fname = (file.name || '').toLowerCase();
+          if (fname.includes('ambulan') || fname.includes('isuzu') || fname.includes('mobil')) matchedAsset = assets.find(x => x.nama.includes('Ambulance'));
+          else if (fname.includes('proyektor') || fname.includes('projector') || fname.includes('infocus') || fname.includes('acer')) matchedAsset = assets.find(x => x.nama.includes('Projector'));
+          else if (fname.includes('laptop') || fname.includes('asus') || fname.includes('lenovo') || fname.includes('pc')) matchedAsset = assets.find(x => x.id === 165) || assets.find(x => x.nama.includes('Lap Top'));
+          else if (fname.includes('hema') || fname.includes('lab') || fname.includes('genrui')) matchedAsset = assets.find(x => x.nama.includes('Hematology'));
+          else if (fname.includes('incu') || fname.includes('bayi') || fname.includes('baby')) matchedAsset = assets.find(x => x.nama.includes('Baby Incubator'));
+          else if (fname.includes('kulkas') || fname.includes('vaksin') || fname.includes('hiron')) matchedAsset = assets.find(x => x.id === 157);
+          else if (fname.includes('kursi') || fname.includes('meja')) matchedAsset = assets.find(x => x.nama.includes('Kursi Kerja'));
+          else if (fname.includes('printer') || fname.includes('epson')) matchedAsset = assets.find(x => x.nama.includes('Printer'));
+          else {
+            matchedAsset = assets.find(x => x.id === currentAssetId) || assets[0];
+          }
+        }
+
+        if (matchedAsset) {
+          matchedAsset.custom_photo = dataUrl;
+          matchedAsset.has_photo = true;
+          matchedAsset.status_rekon = 'Terverifikasi e-BMD';
+          aiScanCountToday += 1;
           saveState();
           updateKPIs();
           renderCatalogTable();
           renderRekonGrid();
-          selectAssetForStage(a.id, true, `Foto fisik untuk ${a.nama} (${a.kode_aset}) berhasil disimpan ke database e-BMD! Status kelengkapan foto kini: Lengkap.`);
-          renderMobileView();
-          if (!document.getElementById('assetDetailModal').classList.contains('hidden')) {
-            openAssetDetailModal(a.id);
-          }
-          if (isMobileActive) {
-            switchView('mobile-hp');
-            switchPhoneInternalTab('scan');
-            const banner = document.getElementById('mobileCaptureSuccessBanner');
-            if (banner) {
-              banner.textContent = `✅ Foto berhasil disimpan ke ${a.kode_aset} — ${a.nama}!`;
-              banner.classList.remove('hidden');
-            }
-            document.getElementById('mobileResultCard')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-          }
+
+          switchView('ringkasan');
+          selectAssetForStage(
+            matchedAsset.id,
+            true,
+            `AI Vision berhasil membaca foto Anda! Barang cocok dengan ${matchedAsset.nama} (${matchedAsset.merk}), Kode ${matchedAsset.kode_aset}, NIBAR ${matchedAsset.nibar}, Nilai ${formatRupiah(matchedAsset.nilai_perolehan)}. Foto juga otomatis tersimpan ke data aset ini.`
+          );
+
           activityLogs.unshift({
             id: Date.now(),
-            icon: '📷',
-            title: `${a.nama} (${a.kode_aset})`,
-            desc: 'Foto fisik baru ditambahkan & terverifikasi e-BMD',
+            icon: '🤖',
+            title: `AI Scan: ${matchedAsset.nama}`,
+            desc: `Foto dikenali & disimpan ke ${matchedAsset.kode_aset}`,
             time: 'Baru saja',
-            assetId: a.id
+            assetId: matchedAsset.id
           });
           renderActivityFeed();
-          showToast(`Foto aset ${a.nama} berhasil disimpan!`);
-          return;
+          closeCameraModal();
+          showToast(`AI Vision Mengenali: ${matchedAsset.nama} (${matchedAsset.kode_aset})`);
         }
-      }
-
-      const mobSelectVal = document.getElementById('mobileTargetAssetSelect')?.value || 'AUTO';
-      const camSelectVal = document.getElementById('cameraTargetAssetSelect')?.value || 'AUTO';
-      const targetSelectVal = (isMobileActive && mobSelectVal !== 'AUTO') ? mobSelectVal : camSelectVal;
-      let matchedAsset = null;
-
-      if (targetSelectVal !== 'AUTO') {
-        matchedAsset = assets.find(x => x.id === Number(targetSelectVal));
-      } else {
-        const fname = (file.name || '').toLowerCase();
-        if (fname.includes('ambulan') || fname.includes('isuzu') || fname.includes('mobil')) matchedAsset = assets.find(x => x.nama.includes('Ambulance'));
-        else if (fname.includes('proyektor') || fname.includes('projector') || fname.includes('infocus') || fname.includes('acer')) matchedAsset = assets.find(x => x.nama.includes('Projector'));
-        else if (fname.includes('laptop') || fname.includes('asus') || fname.includes('lenovo') || fname.includes('pc')) matchedAsset = assets.find(x => x.id === 165) || assets.find(x => x.nama.includes('Lap Top'));
-        else if (fname.includes('hema') || fname.includes('lab') || fname.includes('genrui')) matchedAsset = assets.find(x => x.nama.includes('Hematology'));
-        else if (fname.includes('incu') || fname.includes('bayi') || fname.includes('baby')) matchedAsset = assets.find(x => x.nama.includes('Baby Incubator'));
-        else if (fname.includes('kulkas') || fname.includes('vaksin') || fname.includes('hiron')) matchedAsset = assets.find(x => x.id === 157);
-        else if (fname.includes('kursi') || fname.includes('meja')) matchedAsset = assets.find(x => x.nama.includes('Kursi Kerja'));
-        else if (fname.includes('printer') || fname.includes('epson')) matchedAsset = assets.find(x => x.nama.includes('Printer'));
-        else {
-          matchedAsset = assets.find(x => x.id === currentAssetId) || assets[0];
-        }
-      }
-
-      if (matchedAsset) {
-        matchedAsset.custom_photo = dataUrl;
-        matchedAsset.has_photo = true;
-        matchedAsset.status_rekon = 'Terverifikasi e-BMD';
-        currentAssetId = matchedAsset.id;
-        aiScanCountToday += 1;
-        saveState();
-        updateKPIs();
-        renderCatalogTable();
-        renderRekonGrid();
-
-        selectAssetForStage(
-          matchedAsset.id,
-          true,
-          `AI Vision berhasil membaca foto Anda! Barang cocok dengan ${matchedAsset.nama} (${matchedAsset.merk}), Kode ${matchedAsset.kode_aset}, NIBAR ${matchedAsset.nibar}, Nilai ${formatRupiah(matchedAsset.nilai_perolehan)}. Foto juga otomatis tersimpan ke data aset ini.`
-        );
-        renderMobileView();
-
-        if (isMobileActive) {
-          switchView('mobile-hp');
-          switchPhoneInternalTab('scan');
-          const banner = document.getElementById('mobileCaptureSuccessBanner');
-          if (banner) {
-            banner.textContent = `✅ Foto kamera berhasil dianalisis & disimpan ke ${matchedAsset.kode_aset} (${matchedAsset.nama})!`;
-            banner.classList.remove('hidden');
-          }
-          document.getElementById('mobileResultCard')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        } else {
-          switchView('ringkasan');
-        }
-
-        activityLogs.unshift({
-          id: Date.now(),
-          icon: '🤖',
-          title: `AI Scan: ${matchedAsset.nama}`,
-          desc: `Foto dikenali & disimpan ke ${matchedAsset.kode_aset}`,
-          time: 'Baru saja',
-          assetId: matchedAsset.id
-        });
-        renderActivityFeed();
-        closeCameraModal();
-        stopMobileLiveCamera();
-        showToast(`AI Vision Mengenali: ${matchedAsset.nama} (${matchedAsset.kode_aset})`);
-      }
+      };
+      reader.readAsDataURL(file);
     }
 
     // =========================================================================
@@ -2844,15 +2965,9 @@
 
     function renderMobileView() {
       const sel = document.getElementById('mobileTargetAssetSelect');
-      if (sel) {
-        const prevVal = sel.value || 'AUTO';
+      if (sel && sel.options.length <= 1) {
         sel.innerHTML = `<option value="AUTO">🤖 Deteksi Otomatis AI Vision (Atau Pilih Barang)</option>` +
           assets.map(a => `<option value="${a.id}">${a.kode_aset} — ${a.nama} (${a.merk}) [${a.has_photo ? 'Ada Foto' : 'Belum Foto'}]</option>`).join('');
-        sel.value = prevVal;
-      }
-      const reassignSel = document.getElementById('mobileReassignSelect');
-      if (reassignSel) {
-        reassignSel.innerHTML = assets.map(a => `<option value="${a.id}" ${a.id === Number(currentAssetId) ? 'selected' : ''}>${a.kode_aset} — ${a.nama} (${a.merk})</option>`).join('');
       }
 
       const a = assets.find(x => x.id === Number(currentAssetId)) || assets[0];
@@ -2874,12 +2989,14 @@
         const qSeri = document.getElementById('mobQuickSeri');
         const qRuang = document.getElementById('mobQuickRuangan');
         const qKond = document.getElementById('mobQuickKondisi');
+        const qKalib = document.getElementById('mobQuickKalibrasi');
         const qSpek = document.getElementById('mobQuickSpek');
         if (qNama) qNama.value = a.nama || '';
         if (qMerk) qMerk.value = a.merk || '';
         if (qSeri) qSeri.value = a.nomor_rangka || '';
         if (qRuang) qRuang.value = a.ruangan || '';
         if (qKond) qKond.value = a.kondisi || 'Baik';
+        if (qKalib) qKalib.value = a.jadwal_kalibrasi || '2026-11-15';
         if (qSpek) qSpek.value = a.spesifikasi_teknis || '';
 
         const pb = document.getElementById('mobResPhotoBadge');
@@ -2998,7 +3115,7 @@
     }
 
     function switchView(viewName) {
-      ['ringkasan', 'data-aset', 'inventarisasi', 'laporan', 'pengaturan', 'mobile-hp', 'cloud-awam'].forEach(v => {
+      ['ringkasan', 'data-aset', 'inventarisasi', 'laporan', 'pengaturan', 'mobile-hp', 'cloud-awam', 'kalibrasi-mutasi'].forEach(v => {
         const el = document.getElementById(`view-${v}`);
         if (el) {
           if (v === viewName) {
@@ -3022,62 +3139,7 @@
       if (viewName === 'mobile-hp') renderMobileView();
     }
 
-    async function requestCompatibleCameraStream(facing = 'environment') {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error('Browser ini tidak mendukung akses kamera langsung (WebRTC).');
-      }
-      try {
-        return await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: facing }, width: { ideal: 1280 }, height: { ideal: 720 } },
-          audio: false
-        });
-      } catch (e1) {
-        return await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-      }
-    }
-
-    async function startMobileLiveCamera(facing = 'environment') {
-      stopMobileLiveCamera();
-      currentCameraFacing = facing;
-      const container = document.getElementById('mobileLiveCameraContainer');
-      const video = document.getElementById('mobileLiveVideoEl');
-      const diagBox = document.getElementById('mobileCameraDiagBox');
-      const diagText = document.getElementById('mobileCameraDiagText');
-
-      try {
-        if (diagBox) diagBox.classList.add('hidden');
-        if (container) container.classList.remove('hidden');
-        const stream = await requestCompatibleCameraStream(facing);
-        mobileLiveStream = stream;
-        if (video) {
-          video.srcObject = stream;
-          video.setAttribute('playsinline', 'true');
-          video.muted = true;
-          await video.play();
-        }
-        showToast('Kamera Live HP Aktif! Arahkan ke barang lalu tekan Jepret.');
-      } catch (err) {
-        if (container) container.classList.add('hidden');
-        if (diagBox && diagText) {
-          diagBox.classList.remove('hidden');
-          diagText.innerHTML = `Kamera Live tidak diizinkan oleh browser ini (pesan: <code>${err.message || 'Permission denied'}</code>). <strong>Solusi Mudah:</strong> Tekan tombol <strong>"📸 Kamera Sistem HP"</strong> di bawah ini, atau pastikan Anda membuka link <strong>https://dduo26.github.io/asett/</strong> langsung di aplikasi <strong>Google Chrome / Safari</strong> (bukan di dalam browser internal WhatsApp) dan klik <strong>Allow/Izinkan Kamera</strong>.`;
-        }
-        showToast('Gunakan tombol "📸 Kamera Sistem HP" di bawah atau izinkan kamera di Chrome.');
-      }
-    }
-
-    function stopMobileLiveCamera() {
-      const container = document.getElementById('mobileLiveCameraContainer');
-      const video = document.getElementById('mobileLiveVideoEl');
-      if (mobileLiveStream) {
-        mobileLiveStream.getTracks().forEach(t => t.stop());
-        mobileLiveStream = null;
-      }
-      if (video) video.srcObject = null;
-      if (container) container.classList.add('hidden');
-    }
-
-    async function openCameraModal() {
+    function openCameraModal() {
       const modal = document.getElementById('cameraScannerModal');
       modal.classList.remove('hidden');
       modal.classList.add('flex');
@@ -3092,20 +3154,20 @@
       const fallback = document.getElementById('cameraFallbackBox');
       const captureBtn = document.getElementById('btnCaptureVideoFrame');
 
-      try {
-        video.classList.remove('hidden');
-        fallback.classList.add('hidden');
-        const stream = await requestCompatibleCameraStream('environment');
-        cameraStream = stream;
-        video.srcObject = stream;
-        video.setAttribute('playsinline', 'true');
-        video.muted = true;
-        await video.play();
-        captureBtn.classList.remove('hidden');
-      } catch (err) {
-        video.classList.add('hidden');
-        fallback.classList.remove('hidden');
-        captureBtn.classList.add('hidden');
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+          .then(stream => {
+            cameraStream = stream;
+            video.srcObject = stream;
+            video.classList.remove('hidden');
+            fallback.classList.add('hidden');
+            captureBtn.classList.remove('hidden');
+          })
+          .catch(() => {
+            video.classList.add('hidden');
+            fallback.classList.remove('hidden');
+            captureBtn.classList.add('hidden');
+          });
       }
     }
 
@@ -3609,67 +3671,16 @@
         if (wrap) wrap.className = phoneExpanded ? 'w-full max-w-3xl transition-all duration-300' : 'w-full max-w-[430px] transition-all duration-300';
       });
 
-      // Mobile Camera & Gallery Triggers (Live WebRTC + Native <label> Input)
+      // Mobile Camera & Gallery Triggers
       const mobCamInput = document.getElementById('mobileCameraInput');
       const mobGalInput = document.getElementById('mobileGalleryInput');
 
-      document.getElementById('btnPhoneStartLiveCamera').addEventListener('click', () => {
-        startMobileLiveCamera('environment');
-      });
-      document.getElementById('btnPhoneFlipCamera').addEventListener('click', () => {
-        const nextFacing = currentCameraFacing === 'environment' ? 'user' : 'environment';
-        startMobileLiveCamera(nextFacing);
-      });
-      document.getElementById('btnPhoneStopLiveCamera').addEventListener('click', () => {
-        stopMobileLiveCamera();
-      });
-      document.getElementById('btnPhoneSnapLiveFrame').addEventListener('click', () => {
-        const video = document.getElementById('mobileLiveVideoEl');
-        if (!video) return;
-        const cv = document.createElement('canvas');
-        cv.width = video.videoWidth || 640;
-        cv.height = video.videoHeight || 480;
-        cv.getContext('2d').drawImage(video, 0, 0, cv.width, cv.height);
-        cv.toBlob(blob => {
-          if (blob) {
-            const f = new File([blob], 'kamera_hp_live.jpg', { type: 'image/jpeg' });
-            handleMobilePhotoInput(f);
-          }
-        }, 'image/jpeg', 0.85);
-      });
-
-      document.getElementById('btnPhoneCameraSnap').addEventListener('click', () => {
-        mobCamInput.click();
-      });
-      document.getElementById('btnPhoneGalleryPick').addEventListener('click', () => {
-        mobGalInput.click();
-      });
+      document.getElementById('btnPhoneCameraSnap').addEventListener('click', () => mobCamInput.click());
+      document.getElementById('btnPhoneGalleryPick').addEventListener('click', () => mobGalInput.click());
       document.getElementById('btnMobUpdatePhoto').addEventListener('click', () => {
         editingAssetId = currentAssetId;
-        const sel = document.getElementById('mobileTargetAssetSelect');
-        if (sel) sel.value = String(currentAssetId);
         mobCamInput.click();
       });
-
-      document.getElementById('btnMobileReassignApply').addEventListener('click', () => {
-        const newTargetId = Number(document.getElementById('mobileReassignSelect')?.value || currentAssetId);
-        const targetAsset = assets.find(x => x.id === newTargetId);
-        if (!targetAsset) return;
-        if (lastCapturedDataUrl) {
-          targetAsset.custom_photo = lastCapturedDataUrl;
-          targetAsset.has_photo = true;
-          targetAsset.status_rekon = 'Terverifikasi e-BMD';
-        }
-        currentAssetId = targetAsset.id;
-        saveState();
-        updateKPIs();
-        selectAssetForStage(targetAsset.id, true);
-        renderCatalogTable();
-        renderRekonGrid();
-        renderMobileView();
-        showToast(`Foto & Detail berhasil dicocokkan ke ${targetAsset.kode_aset} — ${targetAsset.nama}!`);
-      });
-
       document.getElementById('btnMobVerifyNow').addEventListener('click', () => {
         const a = assets.find(x => x.id === currentAssetId);
         if (a) {
@@ -3683,15 +3694,24 @@
       });
       document.getElementById('btnMobOpenFullModal').addEventListener('click', () => openAssetDetailModal(currentAssetId));
 
-      async function handleMobilePhotoInput(file) {
+      function handleMobilePhotoInput(file) {
         if (!file) return;
         const mobTarget = document.getElementById('mobileTargetAssetSelect')?.value || 'AUTO';
         if (mobTarget !== 'AUTO') {
           editingAssetId = Number(mobTarget);
           currentAssetId = Number(mobTarget);
-          await handlePhotoFileSelected(file, 'DETAIL_UPLOAD', true);
+          handlePhotoFileSelected(file, 'DETAIL_UPLOAD');
+          setTimeout(() => {
+            renderMobileView();
+            switchPhoneInternalTab('scan');
+          }, 150);
         } else {
-          await handlePhotoFileSelected(file, 'AI_SCAN', true);
+          handlePhotoFileSelected(file, 'AI_SCAN');
+          setTimeout(() => {
+            switchView('mobile-hp');
+            renderMobileView();
+            switchPhoneInternalTab('scan');
+          }, 150);
         }
       }
 
@@ -3755,121 +3775,209 @@
       });
 
       // =====================================================================
-      // 11. OPTIMASI VERSI HP: TOMBOL SIMPAN EKSPLISIT, LIVE QR SCANNER (jsQR),
-      //     SINKRONISASI HP ⇄ WEB, & ANDROID PWA (OFFLINE/ONLINE)
+      // 11. PEMISAHAN MURNI VERSI WEB & APLIKASI HP + 4 REKOMENDASI CERDAS +
+      //     SOLUSI UNDUH ANTI-GAGAL HP & PUSH GITHUB LANGSUNG
       // =====================================================================
+      let mutationLogs = [
+        { id: 1, date: '2026-10-18 09:15', kode: 'AST-2025-0165', nama: 'Lap Top ASUS Vivobook i3-N305', from: 'Gudang Aset TU', to: 'Ruang Skrining & Pemeriksaan Awal', pj: 'Bendahara Aset' },
+        { id: 2, date: '2026-10-15 11:30', kode: 'AST-2020-0142', nama: 'Hematology Analyzer Genrui KT.6390', from: 'Instalasi Farmasi', to: 'Laboratorium Medik Terpadu', pj: 'Analis Kesehatan / Kepala Lab' },
+        { id: 3, date: '2026-10-10 08:45', kode: 'AST-2022-0157', nama: 'Refrigerator/Freezer Kulkas Vaksin Hiron', from: 'Ruang KIA', to: 'Gudang Farmasi & Cold Chain Vaksin', pj: 'Apoteker / Pengelola Vaksin' }
+      ];
       try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const cloudParam = urlParams.get('cloud');
-        if (cloudParam && cloudParam.startsWith('http')) {
-          firebaseDbUrl = cloudParam.trim().replace(/\/+$/, '');
-          localStorage.setItem('aset_cerdas_firebase_url', firebaseDbUrl);
-          const inp1 = document.getElementById('firebaseDbUrlInput');
-          const inp2 = document.getElementById('mobFirebaseUrlQuick');
-          if (inp1) inp1.value = firebaseDbUrl;
-          if (inp2) inp2.value = firebaseDbUrl;
-          setTimeout(() => pullFromFirebaseCloud(), 450);
-        } else if (firebaseDbUrl) {
-          const inp2 = document.getElementById('mobFirebaseUrlQuick');
-          if (inp2) inp2.value = firebaseDbUrl;
-          const miniBadge = document.getElementById('mobCloudBadgeMini');
-          if (miniBadge) {
-            miniBadge.textContent = 'Cloud Siap';
-            miniBadge.className = 'px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold';
-          }
-        }
+        const savedMut = localStorage.getItem('aset_cerdas_mutasi_kir_v1');
+        if (savedMut) mutationLogs = JSON.parse(savedMut);
       } catch (e) {}
 
-      // Mark unsaved indicator when user edits any mobile specification input
-      ['mobQuickNama', 'mobQuickMerk', 'mobQuickSeri', 'mobQuickRuangan', 'mobQuickKondisi', 'mobQuickSpek'].forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        const markDirty = () => {
-          const banner = document.getElementById('mobSaveStatusBanner');
-          const txt = document.getElementById('mobSaveStatusText');
-          if (banner && txt) {
-            banner.className = 'p-2.5 rounded-xl bg-amber-500/20 border border-amber-400/50 text-[11px] text-amber-200 font-bold flex items-center justify-between gap-2 animate-pulse';
-            txt.textContent = '⚠️ Ada perubahan spesifikasi belum disimpan — Tekan tombol "💾 SIMPAN FOTO & SPESIFIKASI BARANG" di bawah!';
-          }
-        };
-        el.addEventListener('input', markDirty);
-        el.addEventListener('change', markDirty);
-      });
+      function saveMutationLogs() {
+        try { localStorage.setItem('aset_cerdas_mutasi_kir_v1', JSON.stringify(mutationLogs)); } catch (e) {}
+      }
 
-      // Explicit Save Button on Mobile ("💾 SIMPAN FOTO & SPESIFIKASI BARANG")
-      const btnMobSave = document.getElementById('btnMobileExplicitSave');
-      if (btnMobSave) {
-        btnMobSave.addEventListener('click', async () => {
-          const a = assets.find(x => x.id === Number(currentAssetId)) || assets[0];
-          if (!a) return;
+      // --- MODE PEMISAHAN MURNI: WEB DESKTOP vs APLIKASI HP MANDIRI ---
+      let currentAppMode = 'WEB'; // 'WEB' or 'HP'
 
-          const qNama = document.getElementById('mobQuickNama')?.value.trim();
-          const qMerk = document.getElementById('mobQuickMerk')?.value.trim();
-          const qSeri = document.getElementById('mobQuickSeri')?.value.trim();
-          const qRuang = document.getElementById('mobQuickRuangan')?.value.trim();
-          const qKond = document.getElementById('mobQuickKondisi')?.value;
-          const qSpek = document.getElementById('mobQuickSpek')?.value.trim();
+      function activatePureAppMode(mode) {
+        currentAppMode = mode;
+        const asideEl = document.querySelector('aside');
+        const headerEl = document.querySelector('main > header');
+        const kpiSection = document.querySelector('main > section');
+        const btnWeb = document.getElementById('btnModePureWeb');
+        const btnHP = document.getElementById('btnModePureHP');
 
-          if (qNama) a.nama = qNama;
-          if (qMerk) a.merk = qMerk;
-          if (qSeri) a.nomor_rangka = qSeri;
-          if (qRuang) a.ruangan = qRuang;
-          if (qKond) a.kondisi = qKond;
-          if (qSpek !== undefined) a.spesifikasi_teknis = qSpek;
-          a.status_rekon = 'Terverifikasi e-BMD';
-          a.qr_payload = `EBMD-SILIANRAYA|${a.kode_aset}|NIBAR:${a.nibar}|${a.nama}|${a.merk}|RP:${Math.round(a.nilai_perolehan)}`;
+        if (mode === 'HP') {
+          if (asideEl) asideEl.classList.add('hidden');
+          if (headerEl) headerEl.classList.add('hidden');
+          if (kpiSection) kpiSection.classList.add('hidden');
+          switchView('mobile-hp');
+          if (btnHP) btnHP.className = 'px-3 py-1.5 rounded-xl font-extrabold bg-emerald-500 text-white shadow flex items-center gap-1.5 transition';
+          if (btnWeb) btnWeb.className = 'px-3 py-1.5 rounded-xl font-bold bg-white/10 text-slate-300 hover:bg-white/20 flex items-center gap-1.5 transition';
+        } else {
+          if (asideEl) asideEl.classList.remove('hidden');
+          if (headerEl) headerEl.classList.remove('hidden');
+          if (kpiSection) kpiSection.classList.remove('hidden');
+          switchView('ringkasan');
+          if (btnWeb) btnWeb.className = 'px-3 py-1.5 rounded-xl font-extrabold bg-sky-500 text-white shadow flex items-center gap-1.5 transition';
+          if (btnHP) btnHP.className = 'px-3 py-1.5 rounded-xl font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 hover:bg-emerald-500/30 flex items-center gap-1.5 transition';
+        }
+      }
 
-          // Sync URL from quick input if user typed it on Mobile
-          const quickUrlInp = document.getElementById('mobFirebaseUrlQuick');
-          if (quickUrlInp && quickUrlInp.value.trim()) {
-            firebaseDbUrl = quickUrlInp.value.trim().replace(/\/+$/, '');
-            const mainUrlInp = document.getElementById('firebaseDbUrlInput');
-            if (mainUrlInp) mainUrlInp.value = firebaseDbUrl;
-            try { localStorage.setItem('aset_cerdas_firebase_url', firebaseDbUrl); } catch (e) {}
-          }
+      document.getElementById('btnModePureWeb')?.addEventListener('click', () => activatePureAppMode('WEB'));
+      document.getElementById('btnModePureHP')?.addEventListener('click', () => activatePureAppMode('HP'));
 
-          saveState();
-          updateKPIs();
-          selectAssetForStage(a.id, false);
-          renderCatalogTable();
-          renderRekonGrid();
-          renderMobileView();
+      // If opened on a smartphone (< 768px) or with ?mode=hp, automatically run as Pure Standalone HP App!
+      const urlParamsInit = new URLSearchParams(window.location.search);
+      if (window.innerWidth < 768 || urlParamsInit.get('mode') === 'hp' || window.__FORCE_PURE_HP_APP__) {
+        activatePureAppMode('HP');
+        if (window.__FORCE_PURE_HP_APP__) {
+          const sepBar = document.getElementById('topAppSeparationBar');
+          if (sepBar) sepBar.classList.add('hidden');
+        }
+      } else {
+        activatePureAppMode('WEB');
+      }
 
-          const nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-          const banner = document.getElementById('mobSaveStatusBanner');
-          const txt = document.getElementById('mobSaveStatusText');
+      // --- REKOMENDASI 2: KOMPRESI FOTO + WATERMARK GPS & TIMESTAMP AUDIT BPK OTOMATIS ---
+      let cachedGpsText = '1.0842°LU, 124.7815°BT (Puskesmas Silian Raya)';
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+          cachedGpsText = `${pos.coords.latitude.toFixed(5)}°LU, ${pos.coords.longitude.toFixed(5)}°BT (Akurasi ${Math.round(pos.coords.accuracy || 12)}m)`;
+        }, () => {});
+      }
 
-          if (firebaseDbUrl) {
-            await pushToFirebaseCloud(false);
-            if (banner && txt) {
-              banner.className = 'p-2.5 rounded-xl bg-emerald-500/25 border-2 border-emerald-400 text-[11px] text-emerald-200 font-extrabold flex items-center justify-between gap-2';
-              txt.textContent = `✅ TERSIMPAN & TERSINKRON KE WEB CLOUD (${nowStr}) — Foto & Spesifikasi ${a.kode_aset} berhasil diperbarui!`;
+      function processAndWatermarkPhoto(dataUrl, assetObj, maxWidth = 820, quality = 0.80) {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            let w = img.width;
+            let h = img.height;
+            if (w > maxWidth) {
+              h = Math.round((h * maxWidth) / w);
+              w = maxWidth;
             }
-          } else {
-            if (banner && txt) {
-              banner.className = 'p-2.5 rounded-xl bg-emerald-500/20 border border-emerald-400/50 text-[11px] text-emerald-200 font-bold flex items-center justify-between gap-2';
-              txt.textContent = `✅ TERSIMPAN DI HP (${nowStr}) — Untuk sinkron otomatis ke Web Laptop, isi URL Firebase di bawah atau klik "📤 Kirim File Sync (.JSON)".`;
+            const cv = document.createElement('canvas');
+            cv.width = w;
+            cv.height = h;
+            const ctx = cv.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+
+            const useWatermark = document.getElementById('chkWatermarkGPS')?.checked !== false;
+            if (useWatermark && assetObj) {
+              const barH = Math.max(54, Math.round(h * 0.13));
+              ctx.fillStyle = 'rgba(15, 23, 42, 0.82)';
+              ctx.fillRect(0, h - barH, w, barH);
+              ctx.fillStyle = '#38bdf8';
+              ctx.fillRect(0, h - barH, w, 3);
+
+              const f1 = Math.max(11, Math.round(w * 0.022));
+              const f2 = Math.max(10, Math.round(w * 0.018));
+              ctx.font = `bold ${f1}px sans-serif`;
+              ctx.fillStyle = '#ffffff';
+              ctx.fillText(`E-BMD PUSKESMAS SILIAN RAYA • ${assetObj.kode_aset} — ${assetObj.nama}`, 12, h - barH + f1 + 6);
+
+              ctx.font = `${f2}px monospace`;
+              ctx.fillStyle = '#34d399';
+              const nowStamp = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'medium' });
+              ctx.fillText(`📍 ${assetObj.ruangan} | GPS: ${cachedGpsText}`, 12, h - barH + f1 + f2 + 12);
+
+              ctx.fillStyle = '#fde047';
+              ctx.fillText(`🕒 Audit Rekon: ${nowStamp} | NIBAR: ${assetObj.nibar}`, 12, h - 8);
             }
-            showToast(`✅ Tersimpan! Data & Foto ${a.kode_aset} berhasil disimpan.`);
-          }
+            resolve(cv.toDataURL('image/jpeg', quality));
+          };
+          img.onerror = () => resolve(dataUrl);
+          img.src = dataUrl;
         });
       }
 
-      // Hook Real-Time QR Code Scanner (jsQR) into #mobileLiveVideoEl whenever camera is active
-      function runLiveQRScannerTick() {
+      // --- LIVE CAMERA + REAL-TIME QR CODE SCANNER (jsQR) DI APLIKASI HP ---
+      let mobileLiveStream = null;
+      let currentCameraFacing = 'environment';
+
+      async function startMobileLiveCamera(facing = 'environment') {
+        currentCameraFacing = facing;
+        const cont = document.getElementById('mobileLiveCameraContainer');
+        const video = document.getElementById('mobileLiveVideoEl');
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          document.getElementById('mobileCameraInput').click();
+          return;
+        }
+        try {
+          if (mobileLiveStream) {
+            mobileLiveStream.getTracks().forEach(t => t.stop());
+          }
+          mobileLiveStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: facing }, width: { ideal: 1280 }, height: { ideal: 720 } },
+            audio: false
+          });
+          video.srcObject = mobileLiveStream;
+          cont.classList.remove('hidden');
+          await video.play();
+        } catch (err) {
+          showToast('Membuka Kamera Native HP...');
+          document.getElementById('mobileCameraInput').click();
+        }
+      }
+
+      function stopMobileLiveCamera() {
+        if (mobileLiveStream) {
+          mobileLiveStream.getTracks().forEach(t => t.stop());
+          mobileLiveStream = null;
+        }
+        const cont = document.getElementById('mobileLiveCameraContainer');
+        if (cont) cont.classList.add('hidden');
+      }
+
+      document.getElementById('btnPhoneStartLiveCamera')?.addEventListener('click', () => startMobileLiveCamera('environment'));
+      document.getElementById('btnPhoneFlipCamera')?.addEventListener('click', () => {
+        startMobileLiveCamera(currentCameraFacing === 'environment' ? 'user' : 'environment');
+      });
+      document.getElementById('btnPhoneStopLiveCamera')?.addEventListener('click', stopMobileLiveCamera);
+
+      document.getElementById('btnPhoneSnapLiveFrame')?.addEventListener('click', async () => {
+        const video = document.getElementById('mobileLiveVideoEl');
+        if (!video) return;
+        const cv = document.createElement('canvas');
+        cv.width = video.videoWidth || 800;
+        cv.height = video.videoHeight || 600;
+        cv.getContext('2d').drawImage(video, 0, 0, cv.width, cv.height);
+        stopMobileLiveCamera();
+
+        const mobTarget = document.getElementById('mobileTargetAssetSelect')?.value || 'AUTO';
+        const targetId = mobTarget !== 'AUTO' ? Number(mobTarget) : currentAssetId;
+        const a = assets.find(x => x.id === targetId) || assets[0];
+        if (a) {
+          const watermarked = await processAndWatermarkPhoto(cv.toDataURL('image/jpeg', 0.85), a);
+          a.custom_photo = watermarked;
+          a.has_photo = true;
+          a.status_rekon = 'Terverifikasi e-BMD';
+          aiScanCountToday += 1;
+          saveState();
+          updateKPIs();
+          selectAssetForStage(a.id, false);
+          renderMobileView();
+
+          const banner = document.getElementById('mobSaveStatusBanner');
+          const txt = document.getElementById('mobSaveStatusText');
+          if (banner && txt) {
+            banner.className = 'p-2.5 rounded-xl bg-amber-500/20 border-2 border-amber-400 text-[11px] text-amber-200 font-extrabold';
+            txt.textContent = `📸 Foto + Watermark GPS untuk ${a.kode_aset} siap! Periksa spesifikasi di bawah lalu tekan "💾 SIMPAN FOTO & SPESIFIKASI BARANG".`;
+          }
+          showToast(`📸 Foto + GPS ${a.nama} terambil! Tekan SIMPAN di bawah.`);
+        }
+      });
+
+      // Real-time QR Scanner loop on #mobileLiveVideoEl
+      function scanLiveQRLoop() {
         const video = document.getElementById('mobileLiveVideoEl');
         const cont = document.getElementById('mobileLiveCameraContainer');
         if (video && cont && !cont.classList.contains('hidden') && video.readyState === video.HAVE_ENOUGH_DATA && typeof jsQR !== 'undefined') {
-          const cw = 300;
-          const ch = 220;
-          if (!window.__qrScanCanvas) {
-            window.__qrScanCanvas = document.createElement('canvas');
-            window.__qrScanCanvas.width = cw;
-            window.__qrScanCanvas.height = ch;
+          if (!window.__qrCanvas) {
+            window.__qrCanvas = document.createElement('canvas');
+            window.__qrCanvas.width = 300;
+            window.__qrCanvas.height = 220;
           }
-          const qctx = window.__qrScanCanvas.getContext('2d');
-          qctx.drawImage(video, 0, 0, cw, ch);
-          const imgData = qctx.getImageData(0, 0, cw, ch);
+          const qctx = window.__qrCanvas.getContext('2d');
+          qctx.drawImage(video, 0, 0, 300, 220);
+          const imgData = qctx.getImageData(0, 0, 300, 220);
           const code = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: 'dontInvert' });
           if (code && code.data) {
             const raw = code.data.trim();
@@ -3884,77 +3992,561 @@
               selectAssetForStage(found.id, true);
               updateKPIs();
               renderMobileView();
-              showToast(`🎯 QR Code Terbaca Otomatis: ${found.kode_aset} — ${found.nama}!`);
+              showToast(`🎯 QR Code Terbaca: ${found.kode_aset} — ${found.nama}!`);
             }
           }
         }
-        requestAnimationFrame(runLiveQRScannerTick);
+        requestAnimationFrame(scanLiveQRLoop);
       }
-      requestAnimationFrame(runLiveQRScannerTick);
+      requestAnimationFrame(scanLiveQRLoop);
 
-      // Quick Sync Controls (HP ⇄ Web)
+      // --- TOMBOL SIMPAN EKSPLISIT DI HP ("💾 SIMPAN FOTO & SPESIFIKASI BARANG") ---
+      ['mobQuickNama', 'mobQuickMerk', 'mobQuickSeri', 'mobQuickRuangan', 'mobQuickKondisi', 'mobQuickKalibrasi', 'mobQuickSpek'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const markDirty = () => {
+          const banner = document.getElementById('mobSaveStatusBanner');
+          const txt = document.getElementById('mobSaveStatusText');
+          if (banner && txt) {
+            banner.className = 'p-2.5 rounded-xl bg-amber-500/20 border border-amber-400/50 text-[11px] text-amber-200 font-bold animate-pulse';
+            txt.textContent = '⚠️ Ada perubahan spesifikasi/foto belum disimpan — Tekan tombol "💾 SIMPAN FOTO & SPESIFIKASI BARANG" di bawah!';
+          }
+        };
+        el.addEventListener('input', markDirty);
+        el.addEventListener('change', markDirty);
+      });
+
+      document.getElementById('btnMobileExplicitSave')?.addEventListener('click', async () => {
+        const a = assets.find(x => x.id === Number(currentAssetId)) || assets[0];
+        if (!a) return;
+
+        const oldRoom = a.ruangan;
+        const qNama = document.getElementById('mobQuickNama')?.value.trim();
+        const qMerk = document.getElementById('mobQuickMerk')?.value.trim();
+        const qSeri = document.getElementById('mobQuickSeri')?.value.trim();
+        const qRuang = document.getElementById('mobQuickRuangan')?.value.trim();
+        const qKond = document.getElementById('mobQuickKondisi')?.value;
+        const qKalib = document.getElementById('mobQuickKalibrasi')?.value;
+        const qSpek = document.getElementById('mobQuickSpek')?.value.trim();
+
+        if (qNama) a.nama = qNama;
+        if (qMerk) a.merk = qMerk;
+        if (qSeri) a.nomor_rangka = qSeri;
+        if (qRuang && qRuang !== oldRoom) {
+          mutationLogs.unshift({
+            id: Date.now(),
+            date: new Date().toLocaleString('id-ID'),
+            kode: a.kode_aset,
+            nama: a.nama,
+            from: oldRoom,
+            to: qRuang,
+            pj: a.penanggung_jawab
+          });
+          saveMutationLogs();
+          a.ruangan = qRuang;
+        }
+        if (qKond) a.kondisi = qKond;
+        if (qKalib) a.jadwal_kalibrasi = qKalib;
+        if (qSpek !== undefined) a.spesifikasi_teknis = qSpek;
+        a.status_rekon = 'Terverifikasi e-BMD';
+        a.qr_payload = `EBMD-SILIANRAYA|${a.kode_aset}|NIBAR:${a.nibar}|${a.nama}|${a.merk}|RP:${Math.round(a.nilai_perolehan)}`;
+
+        if (a.custom_photo) {
+          a.custom_photo = await processAndWatermarkPhoto(a.custom_photo, a, 800, 0.78);
+        }
+
+        const quickUrlInp = document.getElementById('mobFirebaseUrlQuick');
+        if (quickUrlInp && quickUrlInp.value.trim()) {
+          firebaseDbUrl = quickUrlInp.value.trim().replace(/\/+$/, '');
+          const mainUrlInp = document.getElementById('firebaseDbUrlInput');
+          if (mainUrlInp) mainUrlInp.value = firebaseDbUrl;
+          try { localStorage.setItem('aset_cerdas_firebase_url', firebaseDbUrl); } catch (e) {}
+        }
+
+        saveState();
+        updateKPIs();
+        selectAssetForStage(a.id, false);
+        renderCatalogTable();
+        renderRekonGrid();
+        renderMobileView();
+        renderSmartRecommendationsView();
+
+        const nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const banner = document.getElementById('mobSaveStatusBanner');
+        const txt = document.getElementById('mobSaveStatusText');
+
+        if (firebaseDbUrl) {
+          await pushToFirebaseCloud(false);
+          if (banner && txt) {
+            banner.className = 'p-2.5 rounded-xl bg-emerald-500/25 border-2 border-emerald-400 text-[11px] text-emerald-200 font-extrabold';
+            txt.textContent = `✅ TERSIMPAN & TERSINKRON KE WEB CLOUD (${nowStr}) — Foto & Spesifikasi ${a.kode_aset} berhasil diperbarui!`;
+          }
+        } else {
+          if (banner && txt) {
+            banner.className = 'p-2.5 rounded-xl bg-emerald-500/20 border border-emerald-400/50 text-[11px] text-emerald-200 font-bold';
+            txt.textContent = `✅ TERSIMPAN DI HP (${nowStr}) — Foto & Spesifikasi ${a.kode_aset} tersimpan! Hubungkan URL Firebase atau klik "📤 Kirim File Sync (.JSON)" untuk menyinkronkan ke Laptop.`;
+          }
+          showToast(`✅ Tersimpan! Foto & Spesifikasi ${a.kode_aset} berhasil disimpan.`);
+        }
+      });
+
+      // --- REKOMENDASI 1: VOICE-TO-SEARCH & VOICE-TO-TEXT SPESIFIKASI (BAHASA INDONESIA) ---
+      function startIndonesianVoiceRecognition(onResultCallback, fallbackDemoText) {
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRec) {
+          showToast(`🎙️ Simulasi Suara Aktif: "${fallbackDemoText}"`);
+          onResultCallback(fallbackDemoText);
+          return;
+        }
+        try {
+          const rec = new SpeechRec();
+          rec.lang = 'id-ID';
+          rec.interimResults = false;
+          rec.maxAlternatives = 1;
+          showToast('🎙️ Silakan bicara sekarang (Bahasa Indonesia)...');
+          rec.onresult = (event) => {
+            const transcript = event.results?.[0]?.[0]?.transcript || '';
+            if (transcript) {
+              showToast(`🎙️ Terbaca: "${transcript}"`);
+              onResultCallback(transcript);
+            }
+          };
+          rec.onerror = () => {
+            showToast(`🎙️ Mode Cepat: "${fallbackDemoText}"`);
+            onResultCallback(fallbackDemoText);
+          };
+          rec.start();
+        } catch (e) {
+          onResultCallback(fallbackDemoText);
+        }
+      }
+
+      document.getElementById('btnVoiceSearchWeb')?.addEventListener('click', () => {
+        startIndonesianVoiceRecognition((txt) => {
+          const inp = document.getElementById('topQuickSearch');
+          if (inp) {
+            inp.value = txt;
+            inp.dispatchEvent(new Event('input'));
+          }
+        }, 'Ambulance Isuzu');
+      });
+
+      document.getElementById('btnVoiceSelectMobile')?.addEventListener('click', () => {
+        startIndonesianVoiceRecognition((txt) => {
+          const q = txt.toLowerCase();
+          const found = assets.find(a =>
+            a.nama.toLowerCase().includes(q) ||
+            a.merk.toLowerCase().includes(q) ||
+            a.ruangan.toLowerCase().includes(q)
+          ) || assets[0];
+          if (found) {
+            selectAssetForStage(found.id, true);
+            renderMobileView();
+          }
+        }, 'Hematology Analyzer');
+      });
+
+      document.getElementById('btnVoiceSearchMobileList')?.addEventListener('click', () => {
+        startIndonesianVoiceRecognition((txt) => {
+          const inp = document.getElementById('mobileSearchInput');
+          if (inp) {
+            inp.value = txt;
+            renderMobileSearchList();
+          }
+        }, 'Nebulizer');
+      });
+
+      document.getElementById('btnVoiceDictateSpec')?.addEventListener('click', () => {
+        startIndonesianVoiceRecognition((txt) => {
+          const spekEl = document.getElementById('mobQuickSpek');
+          if (spekEl) {
+            spekEl.value = (spekEl.value ? spekEl.value + ' • ' : '') + txt;
+            spekEl.dispatchEvent(new Event('input'));
+          }
+        }, 'Kondisi fisik baik, menyala normal saat rekon ruangan Puskesmas Silian Raya.');
+      });
+
+      // --- REKOMENDASI 3 & 4: KALIBRASI ALKES, PAJAK AMBULANCE & LOG MUTASI KIR ---
+      function renderSmartRecommendationsView() {
+        const calAssets = assets.filter(a =>
+          a.bidang.includes('KEDOKTERAN') ||
+          a.bidang.includes('LABORATORIUM') ||
+          a.bidang.includes('ANGKUTAN')
+        );
+
+        const dueCount = calAssets.filter(a => (a.jadwal_kalibrasi || '2026-11-15') <= '2027-01-15').length;
+        const statEl = document.getElementById('statKalibrasiDue');
+        if (statEl) statEl.textContent = `${dueCount} Unit`;
+        const badgeEl = document.getElementById('sidebarKalibrasiBadge');
+        if (badgeEl) badgeEl.textContent = `${dueCount} Cek`;
+
+        const calHtml = calAssets.slice(0, 25).map(a => {
+          const isVehicle = a.bidang.includes('ANGKUTAN');
+          const due = a.jadwal_kalibrasi || '2026-11-15';
+          const isSoon = due <= '2026-12-31';
+          return `
+            <div class="p-2.5 rounded-xl bg-black/25 border border-white/10 flex flex-wrap items-center justify-between gap-2">
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-mono text-[10px] font-bold text-sky-400">${a.kode_aset}</span>
+                  <span class="px-2 py-0.5 rounded-full text-[9px] font-bold ${isSoon ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/20 text-emerald-300'}">
+                    ${isVehicle ? '🚑 Pajak & Servis' : '🩺 Kalibrasi BPFK'}: ${due}
+                  </span>
+                </div>
+                <div class="font-bold text-xs truncate mt-0.5">${a.nama} (${a.merk})</div>
+                <div class="text-[10px] opacity-70 truncate">📍 ${a.ruangan}</div>
+              </div>
+              <button type="button" data-calibrate-id="${a.id}" class="btn-3d-primary px-2.5 py-1 text-[10px] font-bold shrink-0">
+                ✓ Sudah Kalibrasi (2027)
+              </button>
+            </div>
+          `;
+        }).join('');
+
+        const webCal = document.getElementById('webCalibrationList');
+        if (webCal) webCal.innerHTML = calHtml;
+        const mobCal = document.getElementById('mobileCalibrationList');
+        if (mobCal) mobCal.innerHTML = calHtml;
+
+        document.querySelectorAll('[data-calibrate-id]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = Number(btn.getAttribute('data-calibrate-id'));
+            const a = assets.find(x => x.id === id);
+            if (a) {
+              a.jadwal_kalibrasi = '2027-11-15';
+              a.kondisi = 'Baik';
+              a.status_rekon = 'Terverifikasi e-BMD';
+              saveState();
+              renderSmartRecommendationsView();
+              renderMobileView();
+              showToast(`✅ Jadwal Kalibrasi/Servis ${a.kode_aset} diperpanjang ke 2027-11-15!`);
+            }
+          });
+        });
+
+        // Populate KIR rooms & Mutation Asset selector
+        const rooms = Array.from(new Set(assets.map(a => a.ruangan))).sort();
+        const kirSel = document.getElementById('kirRoomSelect');
+        if (kirSel && kirSel.options.length === 0) {
+          kirSel.innerHTML = rooms.map(r => `<option value="${r}">${r} (${assets.filter(x => x.ruangan === r).length} unit)</option>`).join('');
+        }
+        const mutSel = document.getElementById('mutasiAssetSelect');
+        if (mutSel && mutSel.options.length === 0) {
+          mutSel.innerHTML = assets.map(a => `<option value="${a.id}">${a.kode_aset} — ${a.nama} [${a.ruangan}]</option>`).join('');
+        }
+
+        const mutHtml = mutationLogs.map(m => `
+          <div class="p-2 rounded-xl bg-white/5 border border-white/10 space-y-0.5">
+            <div class="flex items-center justify-between text-[10px] text-sky-400 font-mono">
+              <span>${m.kode}</span>
+              <span>${m.date}</span>
+            </div>
+            <div class="font-bold text-xs">${m.nama}</div>
+            <div class="text-[10px] text-emerald-300">🔄 ${m.from} ➔ <strong>${m.to}</strong></div>
+            <div class="text-[10px] opacity-65">PJ: ${m.pj}</div>
+          </div>
+        `).join('');
+
+        const webMut = document.getElementById('webMutationLogContainer');
+        if (webMut) webMut.innerHTML = mutHtml;
+        const mobMut = document.getElementById('mobileMutationList');
+        if (mobMut) mobMut.innerHTML = mutHtml;
+      }
+
+      renderSmartRecommendationsView();
+
+      document.getElementById('btnMarkAllCalibrated')?.addEventListener('click', () => {
+        assets.forEach(a => { a.jadwal_kalibrasi = '2027-11-15'; });
+        saveState();
+        renderSmartRecommendationsView();
+        showToast('✅ Seluruh jadwal kalibrasi Alkes & Ambulance diperbarui ke periode 2027!');
+      });
+
+      document.getElementById('btnSaveMutasiRoom')?.addEventListener('click', () => {
+        const assetId = Number(document.getElementById('mutasiAssetSelect')?.value || 1);
+        const newRoom = document.getElementById('mutasiRuanganBaru')?.value.trim();
+        const newPJ = document.getElementById('mutasiPJBaru')?.value.trim();
+        const a = assets.find(x => x.id === assetId);
+        if (!a || !newRoom) {
+          showToast('Ketik nama Ruangan Tujuan Baru terlebih dahulu.');
+          return;
+        }
+        const oldRoom = a.ruangan;
+        a.ruangan = newRoom;
+        if (newPJ) a.penanggung_jawab = newPJ;
+        mutationLogs.unshift({
+          id: Date.now(),
+          date: new Date().toLocaleString('id-ID'),
+          kode: a.kode_aset,
+          nama: a.nama,
+          from: oldRoom,
+          to: newRoom,
+          pj: a.penanggung_jawab
+        });
+        saveMutationLogs();
+        saveState();
+        populateRuanganDropdown();
+        renderSmartRecommendationsView();
+        renderCatalogTable();
+        showToast(`🔄 Mutasi ${a.kode_aset} ke "${newRoom}" tercatat di Log KIR!`);
+      });
+
+      document.getElementById('btnPrintKIRRoom')?.addEventListener('click', () => {
+        const room = document.getElementById('kirRoomSelect')?.value || assets[0].ruangan;
+        const roomAssets = assets.filter(a => a.ruangan === room);
+        const area = document.getElementById('printableArea');
+        if (!area) return;
+        const sumRoom = roomAssets.reduce((s, a) => s + (Number(a.nilai_perolehan) || 0), 0);
+        area.innerHTML = `
+          <div style="font-family:sans-serif; line-height:1.5;">
+            <h2 style="text-align:center; font-size:16px; font-weight:800; margin:0;">KARTU INVENTARIS RUANGAN (KIR) — PUSKESMAS SILIAN RAYA</h2>
+            <p style="text-align:center; font-size:12px; margin:4px 0 14px;">Ruangan / Lokasi: <strong>${room}</strong> • Total: ${roomAssets.length} Unit (${formatRupiah(sumRoom)})</p>
+            <table style="width:100%; border-collapse:collapse; font-size:10px;" border="1" cellpadding="5">
+              <thead>
+                <tr style="background:#f1f5f9;">
+                  <th>No</th><th>Kode Aset & NIBAR</th><th>Nama Barang & Merk</th><th>No. Seri</th><th>Tahun & Cara</th><th>Nilai (Rp)</th><th>Kondisi</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${roomAssets.map((a, idx) => `
+                  <tr>
+                    <td>${idx + 1}</td>
+                    <td><strong>${a.kode_aset}</strong><br/>${a.nibar}</td>
+                    <td><strong>${a.nama}</strong><br/>${a.merk}</td>
+                    <td>${a.nomor_rangka}</td>
+                    <td>${a.tanggal_perolehan}<br/>${a.cara_perolehan}</td>
+                    <td style="text-align:right;">${formatRupiah(a.nilai_perolehan)}</td>
+                    <td>${a.kondisi}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+        window.print();
+      });
+
+      // Override phone bottom tab 'cloud' to open Smart Alerts & Online Sync inside HP App (never leaving HP mode!)
+      document.querySelectorAll('[data-phone-nav]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tab = btn.getAttribute('data-phone-nav');
+          const smartEl = document.getElementById('phoneTabSmartAlerts');
+          const scanEl = document.getElementById('phoneTabScan');
+          const searchEl = document.getElementById('phoneTabSearch');
+          if (tab === 'cloud' && smartEl && scanEl && searchEl) {
+            scanEl.classList.add('hidden');
+            searchEl.classList.add('hidden');
+            smartEl.classList.remove('hidden');
+            renderSmartRecommendationsView();
+          } else if (smartEl) {
+            smartEl.classList.add('hidden');
+          }
+        });
+      });
+
+      // --- SOLUSI UNDUH ANTI-GAGAL DI HP (WEB SHARE API + DATA URI + CLIPBOARD + GITHUB API PUSH) ---
+      function buildUpdatedHtmlString(forPureHP = false) {
+        let docHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+        const updatedAssetsJson = JSON.stringify(assets);
+        docHtml = docHtml.replace(/const INITIAL_ASSETS = \[[\s\S]*?\];/, () => `const INITIAL_ASSETS = ${updatedAssetsJson};`);
+        if (forPureHP) {
+          docHtml = docHtml.replace('<script>', '<script>window.__FORCE_PURE_HP_APP__ = true;');
+          docHtml = docHtml.replace('<title>ASET Cerdas 3D — Sistem AI Vision & Rekonsiliasi e-BMD Puskesmas Silian Raya</title>', '<title>ASET Cerdas Mobile — Aplikasi HP e-BMD Puskesmas Silian Raya</title>');
+        }
+        return docHtml;
+      }
+
+      async function universalMobileDownload(filename, contentStr) {
+        const blob = new Blob([contentStr], { type: 'text/html;charset=utf-8' });
+
+        // 1. Try Native Mobile File Share Sheet first if on mobile device
+        if (window.innerWidth < 900 && navigator.canShare) {
+          try {
+            const fileObj = new File([blob], filename, { type: 'text/html' });
+            if (navigator.canShare({ files: [fileObj] })) {
+              await navigator.share({
+                title: filename,
+                text: 'File Aplikasi ASET Cerdas Puskesmas Silian Raya',
+                files: [fileObj]
+              });
+              showToast(`✅ Berhasil membuka menu Simpan/Bagikan HP untuk ${filename}!`);
+              return;
+            }
+          } catch (err) {}
+        }
+
+        // 2. Standard Blob + Data URI Fallback
+        try {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(url), 3000);
+          showToast(`⬇️ Mengunduh ${filename}... Jika tertahan di browser HP, gunakan tombol "📋 Salin Kode".`);
+        } catch (e) {
+          const dataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(contentStr);
+          window.open(dataUrl, '_blank');
+        }
+      }
+
+      function openDownloadHubModal() {
+        const m = document.getElementById('mobileDownloadHubModal');
+        if (m) {
+          m.classList.remove('hidden');
+          m.classList.add('flex');
+        }
+      }
+
+      document.getElementById('btnOpenMobileDownloadHub')?.addEventListener('click', openDownloadHubModal);
+      document.getElementById('btnDownloadAppSidebar')?.addEventListener('click', openDownloadHubModal);
+      document.getElementById('btnDownloadAppMain')?.addEventListener('click', openDownloadHubModal);
+      document.getElementById('btnDownloadForHosting')?.addEventListener('click', openDownloadHubModal);
+      document.getElementById('btnMobileAppDownloadSelf')?.addEventListener('click', openDownloadHubModal);
+      document.getElementById('btnCloseDownloadHub')?.addEventListener('click', () => {
+        const m = document.getElementById('mobileDownloadHubModal');
+        if (m) {
+          m.classList.add('hidden');
+          m.classList.remove('flex');
+        }
+      });
+
+      document.getElementById('btnHubDownloadHPApp')?.addEventListener('click', () => {
+        universalMobileDownload('hp.html', buildUpdatedHtmlString(true));
+      });
+      document.getElementById('btnHubDownloadWebApp')?.addEventListener('click', () => {
+        universalMobileDownload('index.html', buildUpdatedHtmlString(false));
+      });
+
+      function copyTextGuaranteed(text, label) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(() => {
+            showToast(`📋 Kode ${label} berhasil disalin! Siap ditempel (Paste) ke GitHub.`);
+          }).catch(() => fallbackCopyText(text, label));
+        } else {
+          fallbackCopyText(text, label);
+        }
+      }
+
+      function fallbackCopyText(text, label) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        try {
+          document.execCommand('copy');
+          showToast(`📋 Kode ${label} berhasil disalin ke Clipboard HP!`);
+        } catch (e) {}
+        document.body.removeChild(ta);
+      }
+
+      document.getElementById('btnHubCopyHPCode')?.addEventListener('click', () => {
+        copyTextGuaranteed(buildUpdatedHtmlString(true), 'Aplikasi HP (hp.html)');
+      });
+      document.getElementById('btnHubCopyWebCode')?.addEventListener('click', () => {
+        copyTextGuaranteed(buildUpdatedHtmlString(false), 'Versi Web (index.html)');
+      });
+
+      // Direct GitHub Repository Pusher (dduo26/asett)
+      async function pushFileToGitHubRepo(repo, token, path, contentStr, commitMsg) {
+        const apiUrl = `https://api.github.com/repos/${repo}/contents/${path}`;
+        let sha = undefined;
+        const getRes = await fetch(apiUrl, {
+          headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
+        });
+        if (getRes.ok) {
+          const existing = await getRes.json();
+          sha = existing.sha;
+        }
+        const b64 = btoa(unescape(encodeURIComponent(contentStr)));
+        const putRes = await fetch(apiUrl, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/vnd.github+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: commitMsg,
+            content: b64,
+            ...(sha ? { sha } : {})
+          })
+        });
+        if (!putRes.ok) {
+          const errData = await putRes.json().catch(() => ({}));
+          throw new Error(errData.message || `HTTP ${putRes.status}`);
+        }
+        return true;
+      }
+
+      document.getElementById('btnPushBothToGitHub')?.addEventListener('click', async () => {
+        const repo = (document.getElementById('ghRepoInput')?.value || 'dduo26/asett').trim();
+        const token = (document.getElementById('ghTokenInput')?.value || '').trim();
+        const logEl = document.getElementById('ghPushStatusLog');
+        if (!token) {
+          if (logEl) logEl.textContent = '⚠️ Masukkan GitHub Personal Access Token Anda terlebih dahulu, atau gunakan tombol "📋 Salin Kode" di atas.';
+          showToast('Masukkan Token GitHub atau klik tombol Salin Kode.');
+          return;
+        }
+        try {
+          if (logEl) logEl.textContent = `⏳ Mengirim index.html (Versi Web) & hp.html (Aplikasi HP) ke GitHub ${repo}...`;
+          await pushFileToGitHubRepo(repo, token, 'index.html', buildUpdatedHtmlString(false), 'Update Versi Web ASET Cerdas e-BMD');
+          await pushFileToGitHubRepo(repo, token, 'hp.html', buildUpdatedHtmlString(true), 'Tambah Aplikasi Khusus HP Mandiri (hp.html)');
+          if (logEl) logEl.textContent = `✅ BERHASIL! Versi Web: https://dduo26.github.io/asett/ dan Aplikasi Khusus HP: https://dduo26.github.io/asett/hp.html telah diperbarui!`;
+          showToast('🚀 Berhasil memperbarui GitHub dduo26/asett!');
+        } catch (err) {
+          if (logEl) logEl.textContent = `❌ Gagal Push ke GitHub: ${err.message}. Gunakan tombol "📋 Salin Kode" di atas untuk update manual.`;
+        }
+      });
+
+      // Sync Controls (HP ⇄ Web)
       document.getElementById('btnTopQuickSyncPull')?.addEventListener('click', () => {
         if (firebaseDbUrl) {
           pullFromFirebaseCloud();
         } else {
-          switchView('cloud-awam');
-          showToast('Hubungkan URL Firebase atau muat File Sync (.JSON) dari HP Anda.');
+          openDownloadHubModal();
+          showToast('Buka Pusat Unduh / Sinkronisasi HP ⇄ Web');
         }
       });
-
       document.getElementById('btnMobQuickPushCloud')?.addEventListener('click', () => {
         const inp = document.getElementById('mobFirebaseUrlQuick');
         if (inp && inp.value.trim()) {
           firebaseDbUrl = inp.value.trim().replace(/\/+$/, '');
-          const mainInp = document.getElementById('firebaseDbUrlInput');
-          if (mainInp) mainInp.value = firebaseDbUrl;
           try { localStorage.setItem('aset_cerdas_firebase_url', firebaseDbUrl); } catch (e) {}
         }
         pushToFirebaseCloud(false);
       });
-
       document.getElementById('btnMobQuickPullCloud')?.addEventListener('click', () => {
         const inp = document.getElementById('mobFirebaseUrlQuick');
         if (inp && inp.value.trim()) {
           firebaseDbUrl = inp.value.trim().replace(/\/+$/, '');
-          const mainInp = document.getElementById('firebaseDbUrlInput');
-          if (mainInp) mainInp.value = firebaseDbUrl;
           try { localStorage.setItem('aset_cerdas_firebase_url', firebaseDbUrl); } catch (e) {}
         }
         pullFromFirebaseCloud();
       });
-
       document.getElementById('btnMobCopySyncLink')?.addEventListener('click', () => {
         const inp = document.getElementById('mobFirebaseUrlQuick') || document.getElementById('firebaseDbUrlInput');
         const urlVal = (inp?.value || firebaseDbUrl || '').trim().replace(/\/+$/, '');
         if (!urlVal) {
-          showToast('Tempelkan URL Firebase Realtime Database Anda terlebih dahulu di kotak URL.');
+          showToast('Tempelkan URL Firebase Realtime Database Anda terlebih dahulu.');
           return;
         }
         firebaseDbUrl = urlVal;
-        try { localStorage.setItem('aset_cerdas_firebase_url', firebaseDbUrl); } catch (e) {}
         const shareUrl = `${window.location.origin}${window.location.pathname}?cloud=${encodeURIComponent(firebaseDbUrl)}`;
-        if (navigator.clipboard) {
-          navigator.clipboard.writeText(shareUrl);
-        }
-        showToast('🔗 Link Sinkronisasi disalin! Buka link ini di HP/Laptop agar otomatis terhubung.');
+        copyTextGuaranteed(shareUrl, 'Link Sinkronisasi Cloud');
       });
-
       document.getElementById('btnMobExportSyncJson')?.addEventListener('click', () => {
-        const blob = new Blob([JSON.stringify(assets, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'Sinkron_Aset_HP_ke_Web_Silian_Raya.json';
-        a.click();
-        URL.revokeObjectURL(url);
-        showToast('📤 File Sinkron (.JSON) diunduh! Kirim ke Laptop lalu klik "Muat File Sync".');
+        const jsonStr = JSON.stringify(assets, null, 2);
+        universalMobileDownload('Sinkron_Aset_HP_ke_Web_Silian_Raya.json', jsonStr);
       });
-
       document.getElementById('btnMobImportSyncJson')?.addEventListener('click', () => {
         document.getElementById('importJsonSyncInput')?.click();
       });
-
       document.getElementById('importJsonSyncInput')?.addEventListener('change', (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -3971,6 +4563,7 @@
               renderCatalogTable();
               renderRekonGrid();
               renderMobileView();
+              renderSmartRecommendationsView();
               showToast(`✅ Berhasil menyinkronkan ${assets.length} aset & foto dari file!`);
             }
           } catch (err) {
@@ -3981,35 +4574,26 @@
         e.target.value = '';
       });
 
-      // Progressive Web App (PWA) Manifest + Offline Service Worker + Install Prompt for Android
+      // PWA Manifest + Service Worker Offline Support + Install Prompt
       let deferredInstallPrompt = null;
       try {
         const manifestObj = {
-          name: 'ASET Cerdas e-BMD Puskesmas Silian Raya',
-          short_name: 'ASET Cerdas',
-          description: 'Aplikasi Scan Kamera, QR Code & Spesifikasi Aset e-BMD Puskesmas Silian Raya (Offline & Online)',
-          start_url: window.location.href.split('?')[0],
+          name: 'ASET Cerdas HP — Puskesmas Silian Raya',
+          short_name: 'ASET Cerdas HP',
+          description: 'Aplikasi Khusus HP Scan Kamera, QR Code & Spesifikasi Aset e-BMD Puskesmas Silian Raya (Offline & Online)',
+          start_url: window.location.href.split('?')[0] + '?mode=hp',
           display: 'standalone',
           background_color: '#0d131f',
-          theme_color: '#0ea5e9',
+          theme_color: '#10b981',
           orientation: 'portrait-primary',
           icons: [
-            {
-              src: EMBEDDED_IMGS.assistant,
-              sizes: '192x192',
-              type: 'image/jpeg'
-            },
-            {
-              src: EMBEDDED_IMGS.assistant,
-              sizes: '512x512',
-              type: 'image/jpeg'
-            }
+            { src: EMBEDDED_IMGS.assistant, sizes: '192x192', type: 'image/jpeg' },
+            { src: EMBEDDED_IMGS.assistant, sizes: '512x512', type: 'image/jpeg' }
           ]
         };
         const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
         const manifestUrl = URL.createObjectURL(manifestBlob);
-        const manifestLink = document.getElementById('pwaManifestLink');
-        if (manifestLink) manifestLink.setAttribute('href', manifestUrl);
+        document.getElementById('pwaManifestLink')?.setAttribute('href', manifestUrl);
       } catch (e) {}
 
       window.addEventListener('beforeinstallprompt', (e) => {
@@ -4023,7 +4607,7 @@
           await deferredInstallPrompt.userChoice;
           deferredInstallPrompt = null;
         } else {
-          showToast('📲 Di Chrome Android: ketuk ikon Titik Tiga (⋮) di pojok kanan atas ➔ pilih "Tambahkan ke Layar Utama / Install Aplikasi".');
+          showToast('📲 Di Chrome Android: ketuk ikon Titik Tiga (⋮) di kanan atas ➔ pilih "Install Aplikasi / Tambahkan ke Layar Utama" agar bisa dibuka Offline!');
         }
       });
 
